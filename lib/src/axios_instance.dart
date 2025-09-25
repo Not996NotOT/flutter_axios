@@ -9,6 +9,7 @@ import 'axios_error.dart';
 import 'axios_request.dart';
 import 'axios_response.dart';
 import 'interceptors/interceptor.dart';
+import 'json_mapper/json_mapper.dart';
 import 'models/request_options.dart';
 import 'types/types.dart';
 
@@ -380,7 +381,14 @@ class AxiosInstance {
     }
     
     if (contentType.contains('application/json')) {
-      return jsonEncode(data);
+      try {
+        // 尝试使用 build_runner 生成的 JsonMapper 序列化
+        final serialized = JsonMapper.serialize(data);
+        return jsonEncode(serialized);
+      } catch (e) {
+        // 回退到基础 JSON 编码
+        return jsonEncode(data);
+      }
     }
     
     if (contentType.contains('application/x-www-form-urlencoded')) {
@@ -394,7 +402,7 @@ class AxiosInstance {
     return data.toString();
   }
 
-  /// Parse response data
+  /// Parse response data using build_runner generated JSON mapper
   T _parseResponseData<T>(String body, Headers headers) {
     if (body.isEmpty) {
       return null as T;
@@ -402,24 +410,33 @@ class AxiosInstance {
     
     final contentType = headers['content-type']?.toLowerCase() ?? '';
     
+    // 处理 JSON 内容
     if (contentType.contains('application/json')) {
       try {
+        // 尝试使用 build_runner 生成的 JsonMapper
+        final result = JsonMapper.deserialize<T>(body);
+        if (result != null) {
+          return result;
+        }
+        
+        // 回退到基础 JSON 解析
         final decoded = jsonDecode(body);
-        // If T is dynamic, return decoded as is
         if (T == dynamic) {
           return decoded as T;
         }
-        // Try to cast to T, fallback to body if cast fails
-        try {
-          return decoded as T;
-        } catch (e) {
+        if (T == String) {
           return body as T;
         }
+        
+        // 尝试类型转换
+        return decoded as T;
       } catch (e) {
+        // JSON 解析失败，返回原始字符串
         return body as T;
       }
     }
     
+    // 非 JSON 内容直接返回
     return body as T;
   }
 

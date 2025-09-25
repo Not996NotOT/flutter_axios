@@ -1,0 +1,18 @@
+# Flutter Axios 代码生成配置
+targets:
+  $default:
+    builders:
+      flutter_axios|json_serializable:
+        enabled: true
+        generate_for:
+          - lib/**
+          - example/lib/**
+
+builders:
+  json_serializable:
+    import: "package:flutter_axios/src/json_mapper/minimal_build_runner.dart"
+    builder_factories: ["minimalJsonBuilder"]
+    build_extensions: 
+      ".dart": [".flutter_axios.g.dart"]
+    auto_apply: dependents
+    build_to: source

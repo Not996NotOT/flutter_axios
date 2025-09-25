@@ -9,6 +9,6 @@ export 'src/axios_response.dart';
 export 'src/interceptors/interceptor.dart';
 export 'src/interceptors/request_interceptor.dart';
 export 'src/interceptors/response_interceptor.dart';
+export 'src/json_mapper/json_mapper.dart';
 export 'src/models/request_options.dart';
-// export 'src/models/response_data.dart'; // Removed to avoid conflict with ResponseData type
 export 'src/types/types.dart';

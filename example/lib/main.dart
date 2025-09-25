@@ -1,737 +1,305 @@
-/// Flutter Axios CRUD Example
-/// 
-/// A comprehensive CRUD (Create, Read, Update, Delete) example using Flutter Axios
-/// with a real RESTful API from MockAPI.io
-/// 
-/// API Endpoint: https://mockapi.io/projects/628c335f3df57e983ecafc5a/user
-/// Data Structure: User { id, name, avatar, city }
-
-import 'package:flutter/material.dart';
 import 'package:flutter_axios/flutter_axios.dart';
 
-void main() {
-  // Run console examples first
-  runCrudExamples();
-  
-  // Then run the Flutter app
-  runApp(const UserCrudApp());
+import 'models/product.dart';
+import 'models/product.flutter_axios.g.dart';
+import 'models/user.dart';
+// 导入生成的 JSON 映射文件
+import 'models/user.flutter_axios.g.dart';
+import 'services/api_service.dart';
+
+void main() async {
+  print('🚀 Flutter Axios + build_runner 完整示例');
+  print('=========================================\n');
+
+  // 1. 初始化 JSON 映射器
+  await _initializeJsonMapper();
+
+  // 2. 初始化 API 服务
+  await _initializeApiService();
+
+  // 3. 演示基础 JSON 操作
+  await _demonstrateJsonSerialization();
+
+  // 4. 演示 HTTP 请求
+  await _demonstrateHttpRequests();
+
+  // 5. 演示 CRUD 操作
+  await _demonstrateCrudOperations();
+
+  // 6. 演示错误处理
+  await _demonstrateErrorHandling();
+
+  // 7. 清理资源
+  _cleanup();
+
+  print('\n🎉 示例演示完成！');
+  print('💡 总结:');
+  print('   ✅ build_runner 自动生成 JSON 映射');
+  print('   ✅ 类型安全的 HTTP 请求');
+  print('   ✅ 完整的 CRUD 操作');
+  print('   ✅ 强大的拦截器系统');
+  print('   ✅ 优雅的错误处理');
 }
 
-// ============================================================================
-// Data Models
-// ============================================================================
+/// 初始化 JSON 映射器
+Future<void> _initializeJsonMapper() async {
+  print('📋 初始化 JSON 映射器');
+  print('====================');
 
-/// User model matching the MockAPI data structure
-class User {
-  final String id;
-  final String name;
-  final String avatar;
-  final String city;
+  // 初始化核心映射器
+  initializeJsonMapper();
 
-  const User({
-    required this.id,
-    required this.name,
-    required this.avatar,
-    required this.city,
-  });
+  // 注册所有模型的 JSON 映射
+  initializeUserJsonMappers();
+  initializeProductJsonMappers();
 
-  /// Create User from JSON (like Axios response.data)
-  factory User.fromJson(Map<String, dynamic> json) {
-    return User(
-      id: (json['id'] ?? '').toString(),
-      name: (json['name'] ?? '').toString(),
-      avatar: (json['avatar'] ?? '').toString(),
-      city: (json['city'] ?? '').toString(),
-    );
-  }
-
-  /// Convert User to JSON (for POST/PUT requests)
-  Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'avatar': avatar,
-      'city': city,
-    };
-  }
-
-  /// Create a copy with some fields updated
-  User copyWith({
-    String? id,
-    String? name,
-    String? avatar,
-    String? city,
-  }) {
-    return User(
-      id: id ?? this.id,
-      name: name ?? this.name,
-      avatar: avatar ?? this.avatar,
-      city: city ?? this.city,
-    );
-  }
-
-  @override
-  String toString() => 'User(id: $id, name: $name, city: $city)';
+  print('✅ JSON 映射器初始化完成');
+  print('📊 注册统计: ${JsonMapper.getStats()}');
+  print('');
 }
 
-// ============================================================================
-// API Service using Flutter Axios (like Axios in JavaScript)
-// ============================================================================
+/// 初始化 API 服务
+Future<void> _initializeApiService() async {
+  print('🌐 初始化 API 服务');
+  print('==================');
 
-class UserApiService {
-  // Create Axios instance with base configuration (like axios.create())
-  static final _api = Axios.create(const AxiosConfig(
-    baseURL: 'https://628c335f3df57e983ecafc59.mockapi.io',
-    timeout: Duration(seconds: 30),
-    headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
+  ApiService().initialize();
+
+  print('✅ API 服务初始化完成');
+  print('🔗 基础 URL: https://jsonplaceholder.typicode.com');
+  print('⏱️ 超时时间: 10 秒');
+  print('');
+}
+
+/// 演示 JSON 序列化
+Future<void> _demonstrateJsonSerialization() async {
+  print('📄 演示 JSON 序列化/反序列化');
+  print('=============================');
+
+  // 创建测试用户
+  final user = User(
+    id: 'DEMO_001',
+    name: '张三',
+    email: 'zhangsan@example.com',
+    age: 28,
+    isActive: true,
+    tags: ['开发者', 'Flutter', '测试'],
+    profile: {
+      'city': '北京',
+      'company': '科技公司',
+      'skills': ['Dart', 'Flutter', 'HTTP'],
+      'experience': 5,
     },
-  ));
+    createdAt: DateTime.now().subtract(Duration(days: 30)),
+    updatedAt: DateTime.now(),
+  );
 
-  /// GET /user - Fetch all users
-  /// Equivalent to: axios.get('/user')
-  static Future<List<User>> getAllUsers() async {
-    try {
-      final response = await _api.get<List<dynamic>>('/user');
-      
-      print('✅ GET /user - Status: ${response.status}');
-      print('📊 Found ${response.data.length} users');
-      
-      return response.data.map((json) => User.fromJson(json as Map<String, dynamic>)).toList();
-    } catch (error) {
-      print('❌ GET /user failed: $error');
-      rethrow;
-    }
-  }
+  print('👤 创建的用户: $user');
 
-  /// GET /user/:id - Fetch single user
-  /// Equivalent to: axios.get(`/user/${id}`)
-  static Future<User> getUserById(String id) async {
-    try {
-      final response = await _api.get<Map<String, dynamic>>('/user/$id');
-      
-      print('✅ GET /user/$id - Status: ${response.status}');
-      
-      return User.fromJson(response.data);
-    } catch (error) {
-      print('❌ GET /user/$id failed: $error');
-      rethrow;
-    }
-  }
+  // 测试序列化
+  final jsonString = user.toJsonString();
+  print('📤 序列化为 JSON 字符串 (${jsonString.length} 字符):');
+  print('   ${jsonString.substring(0, 100)}...');
 
-  /// POST /user - Create new user
-  /// Equivalent to: axios.post('/user', userData)
-  static Future<User> createUser(User user) async {
-    try {
-      final response = await _api.post<Map<String, dynamic>>(
-        '/user',
-        data: user.toJson(),
-      );
-      
-      print('✅ POST /user - Status: ${response.status}');
-      print('🆕 Created user with ID: ${response.data['id']}');
-      
-      return User.fromJson(response.data);
-    } catch (error) {
-      print('❌ POST /user failed: $error');
-      rethrow;
-    }
-  }
+  final userMap = user.toMap();
+  print('📄 序列化为 Map (${userMap.keys.length} 个字段):');
+  print('   键: ${userMap.keys.take(5).join(', ')}...');
 
-  /// PUT /user/:id - Update existing user
-  /// Equivalent to: axios.put(`/user/${id}`, userData)
-  static Future<User> updateUser(String id, User user) async {
-    try {
-      final response = await _api.put<Map<String, dynamic>>(
-        '/user/$id',
-        data: user.toJson(),
-      );
-      
-      print('✅ PUT /user/$id - Status: ${response.status}');
-      print('📝 Updated user: ${response.data['name']}');
-      
-      return User.fromJson(response.data);
-    } catch (error) {
-      print('❌ PUT /user/$id failed: $error');
-      rethrow;
-    }
-  }
+  // 测试反序列化
+  final restoredUser = UserJsonFactory.fromJsonString(jsonString);
+  print('📥 从 JSON 字符串反序列化: ${restoredUser?.name}');
 
-  /// DELETE /user/:id - Delete user
-  /// Equivalent to: axios.delete(`/user/${id}`)
-  static Future<void> deleteUser(String id) async {
-    try {
-      final response = await _api.delete('/user/$id');
-      
-      print('✅ DELETE /user/$id - Status: ${response.status}');
-      print('🗑️ User deleted successfully');
-    } catch (error) {
-      print('❌ DELETE /user/$id failed: $error');
-      rethrow;
-    }
-  }
+  final userFromMap = UserJsonFactory.fromMap(userMap);
+  print('📄 从 Map 反序列化: ${userFromMap?.name}');
 
-  /// GET /user with pagination and search
-  /// Equivalent to: axios.get('/user', { params: { page, limit, search } })
-  static Future<List<User>> getUsersWithParams({
-    int page = 1,
-    int limit = 10,
-    String? search,
-  }) async {
-    try {
-      final params = <String, dynamic>{
-        'page': page,
-        'limit': limit,
-      };
-      
-      if (search != null && search.isNotEmpty) {
-        params['search'] = search;
-      }
+  // 验证数据完整性
+  final isIntact = user.name == restoredUser?.name && 
+                   user.email == restoredUser?.email &&
+                   user.tags.length == restoredUser?.tags.length;
+  print('🔍 数据完整性检验: ${isIntact ? "✅ 通过" : "❌ 失败"}');
 
-      final response = await _api.get<List<dynamic>>(
-        '/user',
-        params: params,
-      );
-      
-      print('✅ GET /user with params - Status: ${response.status}');
-      print('📊 Page $page, Limit $limit, Found ${response.data.length} users');
-      
-      return response.data.map((json) => User.fromJson(json as Map<String, dynamic>)).toList();
-    } catch (error) {
-      print('❌ GET /user with params failed: $error');
-      rethrow;
-    }
-  }
+  // 创建测试产品
+  final product = Product(
+    id: 'PROD_001',
+    productName: 'Flutter Axios 教程',
+    description: '学习使用 Flutter Axios 进行 HTTP 请求的完整教程',
+    price: 99.99,
+    originalPrice: 149.99,
+    isAvailable: true,
+    stockCount: 100,
+    rating: 4.8,
+    reviewCount: 256,
+    categoryId: 'CAT_001',
+    categoryName: '编程教程',
+    brandName: 'Flutter 学院',
+    imageUrls: [
+      'https://example.com/image1.jpg',
+      'https://example.com/image2.jpg',
+    ],
+    tags: ['Flutter', 'HTTP', '教程', '进阶'],
+    specifications: {
+      'format': 'PDF + 视频',
+      'pages': 200,
+      'duration': '5小时',
+      'level': '中级',
+    },
+    createdAt: DateTime.now().subtract(Duration(days: 7)),
+    updatedAt: DateTime.now(),
+  );
+
+  print('\n📦 创建的产品: $product');
+  print('💰 折扣信息: ${product.hasDiscount ? "${product.discountPercentage.toStringAsFixed(1)}% 折扣" : "无折扣"}');
+  print('⭐ 评分: ${product.rating} (${product.ratingDescription})');
+  print('📦 库存: ${product.inStock ? "有库存 (${product.stockCount})" : "缺货"}');
+
+  print('');
 }
 
-// ============================================================================
-// Console CRUD Examples (like Axios documentation examples)
-// ============================================================================
+/// 演示 HTTP 请求
+Future<void> _demonstrateHttpRequests() async {
+  print('🌐 演示 HTTP 请求');
+  print('================');
 
-Future<void> runCrudExamples() async {
-  print('🚀 Flutter Axios CRUD Examples with MockAPI\n');
-  
-  // Setup global interceptors for logging
-  UserApiService._api.interceptors.add(LoggingRequestInterceptor(
-    logger: (message) => print('📤 $message'),
-  ));
-  
-  UserApiService._api.interceptors.add(LoggingResponseInterceptor(
-    logger: (message) => print('📥 $message'),
-  ));
+  final apiService = ApiService();
 
   try {
-    // 1. READ - Get all users
-    print('📖 1. READ - Fetching all users...');
-    final users = await UserApiService.getAllUsers();
-    print('   Found ${users.length} users');
+    // 演示 GET 请求
+    print('📍 GET 请求示例:');
+    final users = await apiService.getUsers();
+    print('   获取到 ${users.length} 个用户');
     if (users.isNotEmpty) {
-      print('   First user: ${users.first.name} from ${users.first.city}');
-    }
-    print('');
-
-    // 2. READ - Get single user
-    if (users.isNotEmpty) {
-      print('📖 2. READ - Fetching single user...');
-      final singleUser = await UserApiService.getUserById(users.first.id);
-      print('   User details: ${singleUser.name} (${singleUser.city})');
-      print('');
+      print('   第一个用户: ${users.first.name} (${users.first.email})');
     }
 
-    // 3. CREATE - Add new user
-    print('➕ 3. CREATE - Adding new user...');
+    // 演示 GET 单个资源
+    print('\n📍 GET 单个资源示例:');
+    final user = await apiService.getUser('1');
+    if (user != null) {
+      print('   用户详情: $user');
+    }
+
+    // 演示 POST 请求
+    print('\n📍 POST 请求示例:');
     final newUser = User(
-      id: '', // Will be generated by API
-      name: 'Flutter Axios User',
-      avatar: 'https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/999.jpg',
-      city: 'Axios City',
+      id: 'NEW_001',
+      name: '新用户',
+      email: 'newuser@example.com',
+      age: 25,
+      isActive: true,
+      tags: ['新用户'],
+      profile: {'source': 'API演示'},
+      createdAt: DateTime.now(),
     );
-    
-    final createdUser = await UserApiService.createUser(newUser);
-    print('   Created: ${createdUser.name} with ID ${createdUser.id}');
-    print('');
 
-    // 4. UPDATE - Modify the created user
-    print('✏️ 4. UPDATE - Updating user...');
-    final updatedUser = createdUser.copyWith(
-      name: 'Updated Flutter User',
-      city: 'Updated City',
-    );
-    
-    final result = await UserApiService.updateUser(createdUser.id, updatedUser);
-    print('   Updated: ${result.name} in ${result.city}');
-    print('');
+    final createdUser = await apiService.createUser(newUser);
+    if (createdUser != null) {
+      print('   创建成功: ${createdUser.name}');
+    }
 
-    // 5. DELETE - Remove the user
-    print('🗑️ 5. DELETE - Deleting user...');
-    await UserApiService.deleteUser(createdUser.id);
-    print('   User ${createdUser.id} deleted successfully');
-    print('');
-
-    // 6. READ with parameters
-    print('📖 6. READ with Pagination - First 5 users...');
-    final paginatedUsers = await UserApiService.getUsersWithParams(
-      page: 1,
-      limit: 5,
-    );
-    print('   Paginated results: ${paginatedUsers.length} users');
-    
-  } catch (error) {
-    print('❌ CRUD Example Error: $error');
+  } catch (e) {
+    print('❌ HTTP 请求演示出错: $e');
   }
-  
-  print('✅ All CRUD examples completed!\n');
+
+  print('');
 }
 
-// ============================================================================
-// Flutter App UI - Interactive CRUD Interface
-// ============================================================================
+/// 演示 CRUD 操作
+Future<void> _demonstrateCrudOperations() async {
+  print('🔧 演示 CRUD 操作');
+  print('=================');
 
-class UserCrudApp extends StatelessWidget {
-  const UserCrudApp({super.key});
+  final apiService = ApiService();
 
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Axios CRUD Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        useMaterial3: true,
+  try {
+    // CREATE - 创建
+    print('📝 CREATE (创建):');
+    final createUser = User(
+      id: 'CRUD_001',
+      name: 'CRUD 测试用户',
+      email: 'crud@example.com',
+      age: 30,
+      isActive: true,
+      tags: ['CRUD', '测试'],
+      profile: {'operation': 'CREATE'},
+      createdAt: DateTime.now(),
+    );
+
+    final created = await apiService.createUser(createUser);
+    print('   ✅ 创建用户: ${created?.name}');
+
+    // READ - 读取
+    print('\n📖 READ (读取):');
+    final read = await apiService.getUser('1');
+    print('   ✅ 读取用户: ${read?.name}');
+
+    // UPDATE - 更新
+    print('\n✏️ UPDATE (更新):');
+    if (read != null) {
+      final updated = read.copyWith(
+        name: '${read.name} (已更新)',
+        updatedAt: DateTime.now(),
+      );
+      final result = await apiService.updateUser(read.id, updated);
+      print('   ✅ 更新用户: ${result?.name}');
+    }
+
+    // DELETE - 删除
+    print('\n🗑️ DELETE (删除):');
+    final deleted = await apiService.deleteUser('1');
+    print('   ${deleted ? "✅ 删除成功" : "❌ 删除失败"}');
+
+  } catch (e) {
+    print('❌ CRUD 操作演示出错: $e');
+  }
+
+  print('');
+}
+
+/// 演示错误处理
+Future<void> _demonstrateErrorHandling() async {
+  print('⚠️ 演示错误处理');
+  print('===============');
+
+  final apiService = ApiService();
+
+  try {
+    // 测试无效 URL
+    print('📍 测试无效 URL:');
+    await apiService.getUser('invalid-id-999999');
+
+    // 测试超时
+    print('\n📍 测试网络错误 (模拟):');
+    final axios = AxiosInstance(
+      config: AxiosConfig(
+        baseURL: 'https://httpstat.us',
+        timeout: Duration(milliseconds: 100), // 很短的超时
       ),
-      home: const UserListPage(),
     );
-  }
-}
-
-class UserListPage extends StatefulWidget {
-  const UserListPage({super.key});
-
-  @override
-  State<UserListPage> createState() => _UserListPageState();
-}
-
-class _UserListPageState extends State<UserListPage> {
-  List<User> _users = [];
-  bool _loading = false;
-  String _errorMessage = '';
-
-  @override
-  void initState() {
-    super.initState();
-    _loadUsers();
-  }
-
-  /// Load all users using Flutter Axios
-  Future<void> _loadUsers() async {
-    setState(() {
-      _loading = true;
-      _errorMessage = '';
-    });
 
     try {
-      final users = await UserApiService.getAllUsers();
-      setState(() {
-        _users = users;
-      });
-    } catch (error) {
-      setState(() {
-        _errorMessage = 'Failed to load users: $error';
-      });
-    } finally {
-      setState(() {
-        _loading = false;
-      });
-    }
-  }
-
-  /// Delete user with confirmation
-  Future<void> _deleteUser(User user) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Confirm Delete'),
-        content: Text('Delete user "${user.name}"?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Delete', style: TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
-    );
-
-    if (confirmed == true) {
-      try {
-        await UserApiService.deleteUser(user.id);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${user.name} deleted successfully')),
-        );
-        _loadUsers(); // Refresh list
-      } catch (error) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to delete user: $error')),
-        );
+      await axios.get('/500'); // 模拟服务器错误
+    } catch (e) {
+      if (e is AxiosError) {
+        print('   错误类型: ${e.type}');
+        print('   错误消息: ${e.message}');
+        print('   状态码: ${e.response?.status}');
       }
+    } finally {
+      axios.close();
     }
+
+  } catch (e) {
+    print('❌ 错误处理演示出错: $e');
   }
 
-  /// Navigate to user form for creating/editing
-  Future<void> _navigateToUserForm([User? user]) async {
-    final result = await Navigator.push<bool>(
-      context,
-      MaterialPageRoute(
-        builder: (context) => UserFormPage(user: user),
-      ),
-    );
-
-    if (result == true) {
-      _loadUsers(); // Refresh list if user was saved
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Flutter Axios CRUD Demo'),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        actions: [
-          IconButton(
-            onPressed: _loadUsers,
-            icon: const Icon(Icons.refresh),
-            tooltip: 'Refresh',
-          ),
-        ],
-      ),
-      
-      body: Column(
-        children: [
-          // Header info
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(16),
-            color: Colors.blue.shade50,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  '🌐 RESTful API CRUD with Flutter Axios',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'API: https://628c335f3df57e983ecafc59.mockapi.io/user',
-                  style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'Total Users: ${_users.length}',
-                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-                ),
-              ],
-            ),
-          ),
-
-          // Error message
-          if (_errorMessage.isNotEmpty)
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
-              color: Colors.red.shade50,
-              child: Text(
-                _errorMessage,
-                style: const TextStyle(color: Colors.red),
-              ),
-            ),
-
-          // Loading indicator
-          if (_loading)
-            const Padding(
-              padding: EdgeInsets.all(20),
-              child: CircularProgressIndicator(),
-            ),
-
-          // User list
-          if (!_loading && _users.isNotEmpty)
-            Expanded(
-              child: ListView.builder(
-                itemCount: _users.length,
-                itemBuilder: (context, index) {
-                  final user = _users[index];
-                  return Card(
-                    margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                    child: ListTile(
-                      leading: CircleAvatar(
-                        backgroundImage: NetworkImage(user.avatar),
-                        onBackgroundImageError: (_, __) {},
-                        child: Text(user.name.isNotEmpty ? user.name[0].toUpperCase() : '?'),
-                      ),
-                      title: Text(user.name),
-                      subtitle: Text('📍 ${user.city} • ID: ${user.id}'),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                            onPressed: () => _navigateToUserForm(user),
-                            icon: const Icon(Icons.edit),
-                            tooltip: 'Edit',
-                          ),
-                          IconButton(
-                            onPressed: () => _deleteUser(user),
-                            icon: const Icon(Icons.delete, color: Colors.red),
-                            tooltip: 'Delete',
-                          ),
-                        ],
-                      ),
-                      onTap: () => _navigateToUserForm(user),
-                    ),
-                  );
-                },
-              ),
-            ),
-
-          // Empty state
-          if (!_loading && _users.isEmpty && _errorMessage.isEmpty)
-            const Expanded(
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.people_outline, size: 64, color: Colors.grey),
-                    SizedBox(height: 16),
-                    Text('No users found', style: TextStyle(fontSize: 18, color: Colors.grey)),
-                    SizedBox(height: 8),
-                    Text('Tap + to add your first user', style: TextStyle(color: Colors.grey)),
-                  ],
-                ),
-              ),
-            ),
-        ],
-      ),
-
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _navigateToUserForm(),
-        child: const Icon(Icons.add),
-      ),
-    );
-  }
+  print('');
 }
 
-// ============================================================================
-// User Form Page (Create/Update)
-// ============================================================================
+/// 清理资源
+void _cleanup() {
+  print('🧹 清理资源');
+  print('============');
 
-class UserFormPage extends StatefulWidget {
-  final User? user;
-
-  const UserFormPage({super.key, this.user});
-
-  @override
-  State<UserFormPage> createState() => _UserFormPageState();
-}
-
-class _UserFormPageState extends State<UserFormPage> {
-  final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
-  final _cityController = TextEditingController();
-  final _avatarController = TextEditingController();
-  bool _saving = false;
-
-  bool get _isEditing => widget.user != null;
-
-  @override
-  void initState() {
-    super.initState();
-    if (_isEditing) {
-      _nameController.text = widget.user!.name;
-      _cityController.text = widget.user!.city;
-      _avatarController.text = widget.user!.avatar;
-    } else {
-      // Default avatar for new users
-      _avatarController.text = 'https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/999.jpg';
-    }
-  }
-
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _cityController.dispose();
-    _avatarController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _saveUser() async {
-    if (!_formKey.currentState!.validate()) return;
-
-    setState(() {
-      _saving = true;
-    });
-
-    try {
-      final user = User(
-        id: _isEditing ? widget.user!.id : '',
-        name: _nameController.text.trim(),
-        city: _cityController.text.trim(),
-        avatar: _avatarController.text.trim(),
-      );
-
-      if (_isEditing) {
-        await UserApiService.updateUser(widget.user!.id, user);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('User updated successfully')),
-        );
-      } else {
-        await UserApiService.createUser(user);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('User created successfully')),
-        );
-      }
-
-      Navigator.pop(context, true); // Return true to indicate success
-    } catch (error) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to save user: $error')),
-      );
-    } finally {
-      setState(() {
-        _saving = false;
-      });
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(_isEditing ? 'Edit User' : 'Add User'),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        actions: [
-          TextButton(
-            onPressed: _saving ? null : _saveUser,
-            child: _saving
-                ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Text('Save'),
-          ),
-        ],
-      ),
-      
-      body: Form(
-        key: _formKey,
-        child: ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            // Avatar preview
-            Center(
-              child: CircleAvatar(
-                radius: 50,
-                backgroundImage: _avatarController.text.isNotEmpty
-                    ? NetworkImage(_avatarController.text)
-                    : null,
-                onBackgroundImageError: (_, __) {},
-                child: _avatarController.text.isEmpty
-                    ? const Icon(Icons.person, size: 50)
-                    : null,
-              ),
-            ),
-            const SizedBox(height: 24),
-
-            // Name field
-            TextFormField(
-              controller: _nameController,
-              decoration: const InputDecoration(
-                labelText: 'Name *',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.person),
-              ),
-              validator: (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return 'Name is required';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 16),
-
-            // City field
-            TextFormField(
-              controller: _cityController,
-              decoration: const InputDecoration(
-                labelText: 'City *',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.location_city),
-              ),
-              validator: (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return 'City is required';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 16),
-
-            // Avatar URL field
-            TextFormField(
-              controller: _avatarController,
-              decoration: const InputDecoration(
-                labelText: 'Avatar URL',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.image),
-                helperText: 'Enter image URL for avatar',
-              ),
-              onChanged: (value) {
-                setState(() {}); // Rebuild to update avatar preview
-              },
-            ),
-            const SizedBox(height: 24),
-
-            // API info
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.blue.shade50,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.blue.shade200),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Icon(Icons.api, color: Colors.blue.shade700),
-                      const SizedBox(width: 8),
-                      Text(
-                        _isEditing ? 'PUT Request' : 'POST Request',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.blue.shade700,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    _isEditing 
-                        ? 'Updates user via PUT /user/${widget.user!.id}'
-                        : 'Creates new user via POST /user',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.blue.shade600,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  ApiService().close();
+  print('✅ API 服务已关闭');
 }
