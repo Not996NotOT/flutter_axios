@@ -1,0 +1,51 @@
+# Flutter/Dart related
+.dart_tool/
+.packages
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+
+# IDE related
+.vscode/
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# OS related
+.DS_Store
+Thumbs.db
+
+# Test related
+coverage/
+test_crud.dart
+
+# Build artifacts
+*.so
+*.dylib
+
+# Web
+web/
+
+# Windows
+*.dll
+
+# Compiled Dart code
+*.dill
+
+# Dependency directories
+node_modules/
+
+# Build outputs
+**/build/
+
+# Generated files
+**/*.g.dart
+**/*.mocks.dart
+!test/*.mocks.dart
+
+# Temporary files
+*.tmp
+*.temp
