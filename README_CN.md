@@ -1,62 +1,60 @@
 # Flutter Axios
 
-A promise-based HTTP client for Flutter inspired by [Axios](https://axios-http.com/). Provides interceptors, request/response transformation, error handling, and more.
+一个受 [Axios](https://axios-http.com/) 启发的基于 Promise 的 Flutter HTTP 客户端。提供拦截器、请求/响应转换、错误处理等功能。
 
 [![pub package](https://img.shields.io/pub/v/flutter_axios.svg)](https://pub.dev/packages/flutter_axios)
 
-[📖 中文文档](README_CN.md) | [🚀 Examples](example/lib/main.dart) | [🐛 Issues](https://github.com/Not996NotOT/flutter_axios/issues)
+## 功能特性
 
-## Features
+- ✅ 类似 Axios 的 Promise 风格 API
+- ✅ 请求和响应拦截器  
+- ✅ 请求和响应数据转换
+- ✅ 自动请求体序列化（JSON、表单数据）
+- ✅ 自动响应数据解析
+- ✅ 详细的错误处理和错误类型
+- ✅ 请求/响应超时支持
+- ✅ 查询参数序列化
+- ✅ 自定义实例创建和基础配置
+- ✅ 上传/下载进度回调
+- ✅ 请求取消支持
 
-- ✅ Promise-based API similar to Axios
-- ✅ Request and response interceptors  
-- ✅ Request and response transformation
-- ✅ Automatic request body serialization (JSON, form data)
-- ✅ Automatic response data parsing
-- ✅ Error handling with detailed error types
-- ✅ Request/response timeout support
-- ✅ Query parameters serialization
-- ✅ Custom instance creation with base configuration
-- ✅ Progress callbacks for uploads/downloads
-- ✅ Request cancellation support
+## 安装
 
-## Installation
-
-Add this to your package's `pubspec.yaml` file:
+在你的 `pubspec.yaml` 文件中添加：
 
 ```yaml
 dependencies:
   flutter_axios: ^1.0.0
 ```
 
-Then run:
+然后运行：
 
 ```bash
 flutter pub get
 ```
 
-## Quick Start
+## 快速开始
 
-### Basic Usage
+### 基本用法
 
-Performing a `GET` request (similar to [Axios example](https://axios-http.com/docs/example)):
+执行 `GET` 请求（类似 [Axios 示例](https://axios-http.com/docs/example)）：
 
 ```dart
 import 'package:flutter_axios/flutter_axios.dart';
 
-// Make a request for a user with a given ID
+// 根据给定 ID 请求用户信息
 try {
   final response = await Axios.get<Map<String, dynamic>>(
     'https://jsonplaceholder.typicode.com/users/1'
   );
-  // handle success
+  // 处理成功响应
   print(response.data);
 } catch (error) {
-  // handle error
+  // 处理错误
   print(error);
 }
 
-// Optionally the request above could also be done as
+// 也可以这样写
 try {
   final response = await Axios.get<List<dynamic>>(
     'https://jsonplaceholder.typicode.com/users',
@@ -69,11 +67,11 @@ try {
 } catch (error) {
   print(error);
 } finally {
-  // always executed
-  print('Request completed');
+  // 总是会执行
+  print('请求完成');
 }
 
-// Want to use async/await? Here's how:
+// 想使用 async/await？这样做：
 Future<void> getUser() async {
   try {
     final response = await Axios.get<Map<String, dynamic>>(
@@ -86,7 +84,7 @@ Future<void> getUser() async {
 }
 ```
 
-### Creating an Instance
+### 创建实例
 
 ```dart
 final api = Axios.create(const AxiosConfig(
@@ -98,18 +96,18 @@ final api = Axios.create(const AxiosConfig(
   },
 ));
 
-// Use the instance
+// 使用实例
 final response = await api.get<List<dynamic>>('/users');
 ```
 
-## API Reference
+## API 参考
 
-### Axios Class
+### Axios 类
 
-The main class providing static methods for common HTTP operations:
+提供常用 HTTP 操作的静态方法：
 
 ```dart
-// GET request
+// GET 请求
 Future<AxiosResponse<T>> Axios.get<T>(String url, {
   QueryParameters? params,
   Headers? headers,
@@ -118,7 +116,7 @@ Future<AxiosResponse<T>> Axios.get<T>(String url, {
   ValidateStatus? validateStatus,
 });
 
-// POST request  
+// POST 请求  
 Future<AxiosResponse<T>> Axios.post<T>(String url, {
   RequestData? data,
   QueryParameters? params,
@@ -129,12 +127,12 @@ Future<AxiosResponse<T>> Axios.post<T>(String url, {
   ValidateStatus? validateStatus,
 });
 
-// PUT, PATCH, DELETE, HEAD methods also available
+// PUT、PATCH、DELETE、HEAD 方法同样可用
 ```
 
 ### AxiosInstance
 
-Create custom instances with their own configuration:
+创建带有自定义配置的实例：
 
 ```dart
 final instance = Axios.create(AxiosConfig(
@@ -144,9 +142,9 @@ final instance = Axios.create(AxiosConfig(
 ));
 ```
 
-### Request Options
+### 请求选项
 
-Configure individual requests:
+配置单个请求：
 
 ```dart
 final response = await Axios.request<Map<String, dynamic>>(
@@ -160,66 +158,66 @@ final response = await Axios.request<Map<String, dynamic>>(
 );
 ```
 
-### Response Object
+### 响应对象
 
 ```dart
 class AxiosResponse<T> {
-  final T data;              // Parsed response data
-  final int status;          // HTTP status code
-  final String statusText;   // HTTP status message
-  final Headers headers;     // Response headers
-  final AxiosRequest request; // Original request
-  final String? rawData;     // Raw response body
+  final T data;              // 解析后的响应数据
+  final int status;          // HTTP 状态码
+  final String statusText;   // HTTP 状态消息
+  final Headers headers;     // 响应头
+  final AxiosRequest request; // 原始请求
+  final String? rawData;     // 原始响应体
 }
 ```
 
-## Interceptors
+## 拦截器
 
-### Request Interceptors
+### 请求拦截器
 
-Modify requests before they are sent:
+在请求发送前修改请求：
 
 ```dart
-// Add authentication header
+// 添加认证头
 Axios.interceptors.add(AuthInterceptor(token: 'your-token'));
 
-// Custom request interceptor
+// 自定义请求拦截器
 Axios.interceptors.add(RequestInterceptor((request) {
-  print('Sending request to ${request.url}');
+  print('发送请求到 ${request.url}');
   return request.copyWith(
     headers: {...request.headers, 'X-Timestamp': DateTime.now().toString()},
   );
 }));
 ```
 
-### Response Interceptors
+### 响应拦截器
 
-Process responses or handle errors:
+处理响应或错误：
 
 ```dart
-// Logging interceptor
+// 日志拦截器
 Axios.interceptors.add(LoggingResponseInterceptor(
   logger: (message) => print(message),
 ));
 
-// Custom response interceptor
+// 自定义响应拦截器
 Axios.interceptors.add(ResponseInterceptor((response) {
-  print('Received ${response.status} from ${response.request.url}');
+  print('从 ${response.request.url} 收到 ${response.status} 响应');
   return response;
 }));
 ```
 
-### Built-in Interceptors
+### 内置拦截器
 
-- `AuthInterceptor` - Adds authentication headers
-- `HeadersInterceptor` - Adds custom headers
-- `LoggingRequestInterceptor` - Logs requests
-- `LoggingResponseInterceptor` - Logs responses
-- `RetryInterceptor` - Retry failed requests
+- `AuthInterceptor` - 添加认证头
+- `HeadersInterceptor` - 添加自定义头
+- `LoggingRequestInterceptor` - 记录请求日志
+- `LoggingResponseInterceptor` - 记录响应日志
+- `RetryInterceptor` - 重试失败请求
 
-## Error Handling
+## 错误处理
 
-Flutter Axios provides detailed error information:
+Flutter Axios 提供详细的错误信息：
 
 ```dart
 try {
@@ -229,41 +227,41 @@ try {
   if (error is AxiosError) {
     switch (error.type) {
       case AxiosErrorType.network:
-        print('Network error: ${error.message}');
+        print('网络错误: ${error.message}');
         break;
       case AxiosErrorType.timeout:
-        print('Request timeout');
+        print('请求超时');
         break;
       case AxiosErrorType.response:
-        print('HTTP error: ${error.response?.status}');
+        print('HTTP 错误: ${error.response?.status}');
         break;
       case AxiosErrorType.cancelled:
-        print('Request cancelled');
+        print('请求已取消');
         break;
       default:
-        print('Unknown error: ${error.message}');
+        print('未知错误: ${error.message}');
     }
   }
 }
 ```
 
-## Configuration
+## 配置
 
-### Global Configuration
+### 全局配置
 
-Configure the default instance:
+配置默认实例：
 
 ```dart
-// Access the default instance
+// 访问默认实例
 final defaultInstance = Axios.instance;
 
-// Add global interceptors
+// 添加全局拦截器
 Axios.interceptors.add(LoggingRequestInterceptor(
   logger: (message) => debugPrint(message),
 ));
 ```
 
-### Instance Configuration
+### 实例配置
 
 ```dart
 final api = Axios.create(const AxiosConfig(
@@ -277,9 +275,9 @@ final api = Axios.create(const AxiosConfig(
 ));
 ```
 
-## Examples
+## 示例
 
-### File Upload with Progress
+### 带进度的文件上传
 
 ```dart
 final response = await Axios.post<Map<String, dynamic>>(
@@ -287,12 +285,12 @@ final response = await Axios.post<Map<String, dynamic>>(
   data: formData,
   onUploadProgress: (count, total) {
     final progress = count / total;
-    print('Upload progress: ${(progress * 100).toStringAsFixed(1)}%');
+    print('上传进度: ${(progress * 100).toStringAsFixed(1)}%');
   },
 );
 ```
 
-### Query Parameters
+### 查询参数
 
 ```dart
 final response = await Axios.get<List<dynamic>>(
@@ -306,7 +304,7 @@ final response = await Axios.get<List<dynamic>>(
 );
 ```
 
-### Custom Headers
+### 自定义头
 
 ```dart
 final response = await Axios.post<Map<String, dynamic>>(
@@ -320,9 +318,9 @@ final response = await Axios.post<Map<String, dynamic>>(
 );
 ```
 
-## Testing
+## 测试
 
-Mock HTTP client for testing:
+模拟 HTTP 客户端进行测试：
 
 ```dart
 import 'package:flutter_test/flutter_test.dart';
@@ -330,7 +328,7 @@ import 'package:mockito/mockito.dart';
 import 'package:flutter_axios/flutter_axios.dart';
 
 void main() {
-  test('should handle GET request', () async {
+  test('应该处理 GET 请求', () async {
     final mockClient = MockClient();
     final axios = AxiosInstance(client: mockClient);
     
@@ -344,9 +342,9 @@ void main() {
 }
 ```
 
-## Migration from http package
+## 从 http 包迁移
 
-### Before (http package)
+### 之前（http 包）
 
 ```dart
 import 'package:http/http.dart' as http;
@@ -361,11 +359,11 @@ if (response.statusCode == 200) {
   final data = jsonDecode(response.body);
   print(data);
 } else {
-  throw Exception('Failed to load data');
+  throw Exception('加载数据失败');
 }
 ```
 
-### After (flutter_axios)
+### 之后（flutter_axios）
 
 ```dart
 import 'package:flutter_axios/flutter_axios.dart';
@@ -379,18 +377,31 @@ try {
   final response = await api.get<List<dynamic>>('/users');
   print(response.data);
 } catch (error) {
-  print('Error: $error');
+  print('错误: $error');
 }
 ```
 
-## Contributing
+## CRUD 示例
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+查看 `example/lib/main.dart` 中的完整 CRUD 示例，展示了如何使用 Flutter Axios 与真实的 RESTful API 进行交互。
 
-## License
+该示例包括：
+- 获取用户列表（GET）
+- 创建新用户（POST）
+- 更新用户信息（PUT）
+- 删除用户（DELETE）
+- 带分页的查询
+- 错误处理和加载状态
+- 美观的 Flutter UI
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+## 贡献
 
-## Changelog
+欢迎贡献代码！请随时提交 Pull Request。
 
-See [CHANGELOG.md](CHANGELOG.md) for a list of changes.
+## 许可证
+
+本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情。
+
+## 更新日志
+
+查看 [CHANGELOG.md](CHANGELOG.md) 了解更改列表。
