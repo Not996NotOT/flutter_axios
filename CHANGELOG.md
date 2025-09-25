@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.1] - 2025-09-25
+
+### Changed
+- **注解重命名**: `@JsonSerializable()` → `@AxiosJson()` 
+  - 避免与 `json_annotation` 包冲突
+  - 更简洁的 10 字符注解
+  - 明确表示这是 Flutter Axios 专用的 JSON 注解
+  - 保持所有原有功能不变
+
 ## [1.1.0] - 2025-09-25
 
 ### Added

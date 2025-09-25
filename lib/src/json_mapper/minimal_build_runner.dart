@@ -15,10 +15,10 @@ class MinimalJsonBuilder implements Builder {
   Future<void> build(BuildStep buildStep) async {
     final inputId = buildStep.inputId;
     
-    // 只处理有 @JsonSerializable() 注解的文件
+    // 只处理有 @AxiosJson() 注解的文件
     final content = await buildStep.readAsString(inputId);
     
-    if (!content.contains('@JsonSerializable()')) {
+    if (!content.contains('@AxiosJson()')) {
       return;
     }
 

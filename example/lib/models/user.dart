@@ -2,7 +2,7 @@ import 'package:flutter_axios/flutter_axios.dart';
 
 /// 用户模型 - 匹配 MockAPI 数据结构
 /// 使用 build_runner 自动生成 JSON 映射
-@JsonSerializable()
+@AxiosJson()
 class User {
   final String id;
   final String name;

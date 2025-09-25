@@ -6,12 +6,12 @@ import 'dart:convert';
 
 /// JSON 序列化注解
 /// 标记类需要生成 JSON 映射代码
-class JsonSerializable {
-  const JsonSerializable();
+class AxiosJson {
+  const AxiosJson();
 }
 
 /// JSON 序列化注解实例
-const jsonSerializable = JsonSerializable();
+const axiosJson = AxiosJson();
 
 /// JSON 映射器核心类
 /// 管理类型注册和序列化/反序列化

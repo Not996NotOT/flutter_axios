@@ -40,6 +40,8 @@
 
 ## 🚀 快速开始
 
+> **注解说明**: 我们使用 `@AxiosJson()` 而不是常见的 `@JsonSerializable()`，这样可以避免与 `json_annotation` 包冲突，同时保持简洁性。
+
 ### 安装
 
 添加到你的 `pubspec.yaml`：
@@ -96,7 +98,7 @@ void main() async {
 // lib/models/user.dart
 import 'package:flutter_axios/flutter_axios.dart';
 
-@JsonSerializable()
+@AxiosJson()
 class User {
   final String id;
   final String name;
