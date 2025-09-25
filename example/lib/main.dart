@@ -1,305 +1,569 @@
+import 'dart:async';
+
+import 'package:flutter/material.dart';
 import 'package:flutter_axios/flutter_axios.dart';
 
-import 'models/product.dart';
-import 'models/product.flutter_axios.g.dart';
+// 导入模型和生成的映射代码
 import 'models/user.dart';
-// 导入生成的 JSON 映射文件
 import 'models/user.flutter_axios.g.dart';
-import 'services/api_service.dart';
 
-void main() async {
-  print('🚀 Flutter Axios + build_runner 完整示例');
-  print('=========================================\n');
-
-  // 1. 初始化 JSON 映射器
-  await _initializeJsonMapper();
-
-  // 2. 初始化 API 服务
-  await _initializeApiService();
-
-  // 3. 演示基础 JSON 操作
-  await _demonstrateJsonSerialization();
-
-  // 4. 演示 HTTP 请求
-  await _demonstrateHttpRequests();
-
-  // 5. 演示 CRUD 操作
-  await _demonstrateCrudOperations();
-
-  // 6. 演示错误处理
-  await _demonstrateErrorHandling();
-
-  // 7. 清理资源
-  _cleanup();
-
-  print('\n🎉 示例演示完成！');
-  print('💡 总结:');
-  print('   ✅ build_runner 自动生成 JSON 映射');
-  print('   ✅ 类型安全的 HTTP 请求');
-  print('   ✅ 完整的 CRUD 操作');
-  print('   ✅ 强大的拦截器系统');
-  print('   ✅ 优雅的错误处理');
-}
-
-/// 初始化 JSON 映射器
-Future<void> _initializeJsonMapper() async {
-  print('📋 初始化 JSON 映射器');
-  print('====================');
-
-  // 初始化核心映射器
+void main() {
+  // 初始化 JSON 映射器
   initializeJsonMapper();
-
-  // 注册所有模型的 JSON 映射
   initializeUserJsonMappers();
-  initializeProductJsonMappers();
-
-  print('✅ JSON 映射器初始化完成');
-  print('📊 注册统计: ${JsonMapper.getStats()}');
-  print('');
+  
+  runApp(const MyApp());
 }
 
-/// 初始化 API 服务
-Future<void> _initializeApiService() async {
-  print('🌐 初始化 API 服务');
-  print('==================');
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
-  ApiService().initialize();
-
-  print('✅ API 服务初始化完成');
-  print('🔗 基础 URL: https://jsonplaceholder.typicode.com');
-  print('⏱️ 超时时间: 10 秒');
-  print('');
-}
-
-/// 演示 JSON 序列化
-Future<void> _demonstrateJsonSerialization() async {
-  print('📄 演示 JSON 序列化/反序列化');
-  print('=============================');
-
-  // 创建测试用户
-  final user = User(
-    id: 'DEMO_001',
-    name: '张三',
-    email: 'zhangsan@example.com',
-    age: 28,
-    isActive: true,
-    tags: ['开发者', 'Flutter', '测试'],
-    profile: {
-      'city': '北京',
-      'company': '科技公司',
-      'skills': ['Dart', 'Flutter', 'HTTP'],
-      'experience': 5,
-    },
-    createdAt: DateTime.now().subtract(Duration(days: 30)),
-    updatedAt: DateTime.now(),
-  );
-
-  print('👤 创建的用户: $user');
-
-  // 测试序列化
-  final jsonString = user.toJsonString();
-  print('📤 序列化为 JSON 字符串 (${jsonString.length} 字符):');
-  print('   ${jsonString.substring(0, 100)}...');
-
-  final userMap = user.toMap();
-  print('📄 序列化为 Map (${userMap.keys.length} 个字段):');
-  print('   键: ${userMap.keys.take(5).join(', ')}...');
-
-  // 测试反序列化
-  final restoredUser = UserJsonFactory.fromJsonString(jsonString);
-  print('📥 从 JSON 字符串反序列化: ${restoredUser?.name}');
-
-  final userFromMap = UserJsonFactory.fromMap(userMap);
-  print('📄 从 Map 反序列化: ${userFromMap?.name}');
-
-  // 验证数据完整性
-  final isIntact = user.name == restoredUser?.name && 
-                   user.email == restoredUser?.email &&
-                   user.tags.length == restoredUser?.tags.length;
-  print('🔍 数据完整性检验: ${isIntact ? "✅ 通过" : "❌ 失败"}');
-
-  // 创建测试产品
-  final product = Product(
-    id: 'PROD_001',
-    productName: 'Flutter Axios 教程',
-    description: '学习使用 Flutter Axios 进行 HTTP 请求的完整教程',
-    price: 99.99,
-    originalPrice: 149.99,
-    isAvailable: true,
-    stockCount: 100,
-    rating: 4.8,
-    reviewCount: 256,
-    categoryId: 'CAT_001',
-    categoryName: '编程教程',
-    brandName: 'Flutter 学院',
-    imageUrls: [
-      'https://example.com/image1.jpg',
-      'https://example.com/image2.jpg',
-    ],
-    tags: ['Flutter', 'HTTP', '教程', '进阶'],
-    specifications: {
-      'format': 'PDF + 视频',
-      'pages': 200,
-      'duration': '5小时',
-      'level': '中级',
-    },
-    createdAt: DateTime.now().subtract(Duration(days: 7)),
-    updatedAt: DateTime.now(),
-  );
-
-  print('\n📦 创建的产品: $product');
-  print('💰 折扣信息: ${product.hasDiscount ? "${product.discountPercentage.toStringAsFixed(1)}% 折扣" : "无折扣"}');
-  print('⭐ 评分: ${product.rating} (${product.ratingDescription})');
-  print('📦 库存: ${product.inStock ? "有库存 (${product.stockCount})" : "缺货"}');
-
-  print('');
-}
-
-/// 演示 HTTP 请求
-Future<void> _demonstrateHttpRequests() async {
-  print('🌐 演示 HTTP 请求');
-  print('================');
-
-  final apiService = ApiService();
-
-  try {
-    // 演示 GET 请求
-    print('📍 GET 请求示例:');
-    final users = await apiService.getUsers();
-    print('   获取到 ${users.length} 个用户');
-    if (users.isNotEmpty) {
-      print('   第一个用户: ${users.first.name} (${users.first.email})');
-    }
-
-    // 演示 GET 单个资源
-    print('\n📍 GET 单个资源示例:');
-    final user = await apiService.getUser('1');
-    if (user != null) {
-      print('   用户详情: $user');
-    }
-
-    // 演示 POST 请求
-    print('\n📍 POST 请求示例:');
-    final newUser = User(
-      id: 'NEW_001',
-      name: '新用户',
-      email: 'newuser@example.com',
-      age: 25,
-      isActive: true,
-      tags: ['新用户'],
-      profile: {'source': 'API演示'},
-      createdAt: DateTime.now(),
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Flutter Axios + Build Runner Demo',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        useMaterial3: true,
+      ),
+      home: const UserManagementPage(),
     );
+  }
+}
 
-    final createdUser = await apiService.createUser(newUser);
-    if (createdUser != null) {
-      print('   创建成功: ${createdUser.name}');
-    }
+class UserManagementPage extends StatefulWidget {
+  const UserManagementPage({super.key});
 
-  } catch (e) {
-    print('❌ HTTP 请求演示出错: $e');
+  @override
+  State<UserManagementPage> createState() => _UserManagementPageState();
+}
+
+class _UserManagementPageState extends State<UserManagementPage> {
+  // Axios 实例
+  late final AxiosInstance _axios;
+  
+  // 用户列表
+  List<User> _users = [];
+  bool _isLoading = false;
+  bool _isInitialized = false;
+  
+  // 表单控制器
+  final _nameController = TextEditingController();
+  final _avatarController = TextEditingController();
+  final _cityController = TextEditingController();
+  
+  @override
+  void initState() {
+    super.initState();
+    _initializeAxios();
   }
 
-  print('');
-}
-
-/// 演示 CRUD 操作
-Future<void> _demonstrateCrudOperations() async {
-  print('🔧 演示 CRUD 操作');
-  print('=================');
-
-  final apiService = ApiService();
-
-  try {
-    // CREATE - 创建
-    print('📝 CREATE (创建):');
-    final createUser = User(
-      id: 'CRUD_001',
-      name: 'CRUD 测试用户',
-      email: 'crud@example.com',
-      age: 30,
-      isActive: true,
-      tags: ['CRUD', '测试'],
-      profile: {'operation': 'CREATE'},
-      createdAt: DateTime.now(),
-    );
-
-    final created = await apiService.createUser(createUser);
-    print('   ✅ 创建用户: ${created?.name}');
-
-    // READ - 读取
-    print('\n📖 READ (读取):');
-    final read = await apiService.getUser('1');
-    print('   ✅ 读取用户: ${read?.name}');
-
-    // UPDATE - 更新
-    print('\n✏️ UPDATE (更新):');
-    if (read != null) {
-      final updated = read.copyWith(
-        name: '${read.name} (已更新)',
-        updatedAt: DateTime.now(),
-      );
-      final result = await apiService.updateUser(read.id, updated);
-      print('   ✅ 更新用户: ${result?.name}');
-    }
-
-    // DELETE - 删除
-    print('\n🗑️ DELETE (删除):');
-    final deleted = await apiService.deleteUser('1');
-    print('   ${deleted ? "✅ 删除成功" : "❌ 删除失败"}');
-
-  } catch (e) {
-    print('❌ CRUD 操作演示出错: $e');
-  }
-
-  print('');
-}
-
-/// 演示错误处理
-Future<void> _demonstrateErrorHandling() async {
-  print('⚠️ 演示错误处理');
-  print('===============');
-
-  final apiService = ApiService();
-
-  try {
-    // 测试无效 URL
-    print('📍 测试无效 URL:');
-    await apiService.getUser('invalid-id-999999');
-
-    // 测试超时
-    print('\n📍 测试网络错误 (模拟):');
-    final axios = AxiosInstance(
+  /// 初始化 Axios 实例
+  void _initializeAxios() {
+    _axios = AxiosInstance(
       config: AxiosConfig(
-        baseURL: 'https://httpstat.us',
-        timeout: Duration(milliseconds: 100), // 很短的超时
+        baseURL: 'https://628c335f3df57e983ecafc59.mockapi.io',
+        timeout: const Duration(seconds: 10),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
       ),
     );
 
-    try {
-      await axios.get('/500'); // 模拟服务器错误
-    } catch (e) {
-      if (e is AxiosError) {
-        print('   错误类型: ${e.type}');
-        print('   错误消息: ${e.message}');
-        print('   状态码: ${e.response?.status}');
-      }
-    } finally {
-      axios.close();
-    }
+    // 添加拦截器
+    final interceptor = _CustomInterceptor();
+    _axios.interceptors.add(interceptor);
 
-  } catch (e) {
-    print('❌ 错误处理演示出错: $e');
+    setState(() {
+      _isInitialized = true;
+    });
+    
+    // 初始化完成后立即加载数据
+    _loadUsers();
   }
 
-  print('');
+  /// 加载用户列表
+  Future<void> _loadUsers() async {
+    if (!_isInitialized) return;
+    
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final response = await _axios.get('/user');
+      
+      // 解析用户列表
+      List<User> users = [];
+      if (response.data is List) {
+        final rawList = response.data as List;
+        users = rawList.map((item) => 
+          UserJsonFactory.fromMap(item as Map<String, dynamic>)
+        ).whereType<User>().toList();
+      }
+      
+      setState(() {
+        _users = users;
+      });
+      _showSuccessSnackBar('加载了 ${_users.length} 个用户');
+    } catch (e) {
+      print('加载用户失败: $e');
+      _showErrorSnackBar('加载用户失败');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  /// 创建新用户
+  Future<void> _createUser() async {
+    if (_nameController.text.isEmpty || 
+        _avatarController.text.isEmpty || 
+        _cityController.text.isEmpty) {
+      _showErrorSnackBar('请填写所有字段');
+      return;
+    }
+
+    try {
+      final newUser = User(
+        id: '', // MockAPI 会自动生成 ID
+        name: _nameController.text,
+        avatar: _avatarController.text,
+        city: _cityController.text,
+      );
+
+      final response = await _axios.post<User>('/user', data: newUser);
+      
+      final createdUser = response.data;
+      if (createdUser != null) {
+        setState(() {
+          _users.add(createdUser);
+        });
+        _clearForm();
+        _showSuccessSnackBar('用户创建成功');
+        if (mounted) Navigator.pop(context);
+      }
+    } catch (e) {
+      print('创建用户失败: $e');
+      _showErrorSnackBar('创建用户失败');
+    }
+  }
+
+  /// 更新用户
+  Future<void> _updateUser(User user) async {
+    try {
+      final updatedUser = user.copyWith(
+        name: _nameController.text.isNotEmpty ? _nameController.text : user.name,
+        avatar: _avatarController.text.isNotEmpty ? _avatarController.text : user.avatar,
+        city: _cityController.text.isNotEmpty ? _cityController.text : user.city,
+      );
+
+      final response = await _axios.put<User>('/user/${user.id}', data: updatedUser);
+      
+      final updatedUserData = response.data;
+      if (updatedUserData != null) {
+        final index = _users.indexWhere((u) => u.id == user.id);
+        if (index != -1) {
+          setState(() {
+            _users[index] = updatedUserData;
+          });
+        }
+        _clearForm();
+        _showSuccessSnackBar('用户更新成功');
+        if (mounted) Navigator.pop(context);
+      }
+    } catch (e) {
+      print('更新用户失败: $e');
+      _showErrorSnackBar('更新用户失败');
+    }
+  }
+
+  /// 删除用户
+  Future<void> _deleteUser(User user) async {
+    final confirmed = await _showDeleteConfirmDialog(user);
+    if (!confirmed) return;
+
+    try {
+      await _axios.delete<void>('/user/${user.id}');
+      
+      setState(() {
+        _users.removeWhere((u) => u.id == user.id);
+      });
+      _showSuccessSnackBar('用户删除成功');
+    } catch (e) {
+      print('删除用户失败: $e');
+      _showErrorSnackBar('删除用户失败');
+    }
+  }
+
+  /// 显示创建/编辑用户对话框
+  void _showUserDialog({User? user}) {
+    if (user != null) {
+      _nameController.text = user.name;
+      _avatarController.text = user.avatar;
+      _cityController.text = user.city;
+    } else {
+      _clearForm();
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(user == null ? '创建用户' : '编辑用户'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: _nameController,
+                decoration: const InputDecoration(
+                  labelText: '姓名',
+                  hintText: '请输入用户姓名',
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: _avatarController,
+                decoration: const InputDecoration(
+                  labelText: '头像URL',
+                  hintText: '请输入头像链接',
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: _cityController,
+                decoration: const InputDecoration(
+                  labelText: '城市',
+                  hintText: '请输入所在城市',
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              _clearForm();
+              Navigator.pop(context);
+            },
+            child: const Text('取消'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              if (user == null) {
+                _createUser();
+              } else {
+                _updateUser(user);
+              }
+            },
+            child: Text(user == null ? '创建' : '更新'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 显示删除确认对话框
+  Future<bool> _showDeleteConfirmDialog(User user) async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('确认删除'),
+        content: Text('确定要删除用户 "${user.name}" 吗？'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('取消'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('删除'),
+          ),
+        ],
+      ),
+    );
+    return result ?? false;
+  }
+
+  /// 清空表单
+  void _clearForm() {
+    _nameController.clear();
+    _avatarController.clear();
+    _cityController.clear();
+  }
+
+  /// 显示成功消息
+  void _showSuccessSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.green,
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
+  /// 显示错误消息
+  void _showErrorSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+        duration: const Duration(seconds: 3),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _avatarController.dispose();
+    _cityController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Flutter Axios + Build Runner'),
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: _loadUsers,
+            tooltip: '刷新数据',
+          ),
+        ],
+      ),
+      body: _buildBody(),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _showUserDialog(),
+        tooltip: '添加用户',
+        child: const Icon(Icons.add),
+      ),
+    );
+  }
+
+  Widget _buildBody() {
+    if (!_isInitialized) {
+      return const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(height: 16),
+            Text('正在初始化 Axios...'),
+          ],
+        ),
+      );
+    }
+
+    if (_isLoading) {
+      return const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(height: 16),
+            Text('正在加载用户数据...'),
+          ],
+        ),
+      );
+    }
+
+    if (_users.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.people_outline,
+              size: 64,
+              color: Colors.grey,
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              '暂无用户数据',
+              style: TextStyle(
+                fontSize: 18,
+                color: Colors.grey,
+              ),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: _loadUsers,
+              child: const Text('重新加载'),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return RefreshIndicator(
+      onRefresh: _loadUsers,
+      child: ListView.builder(
+        itemCount: _users.length,
+        itemBuilder: (context, index) {
+          final user = _users[index];
+          return Card(
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: ListTile(
+              leading: CircleAvatar(
+                backgroundImage: NetworkImage(user.avatar),
+                onBackgroundImageError: (_, __) {},
+                child: user.avatar.isEmpty 
+                    ? Text(user.name.isNotEmpty ? user.name[0].toUpperCase() : '?')
+                    : null,
+              ),
+              title: Text(
+                user.name,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('🏙️ ${user.city}'),
+                  Text('🆔 ID: ${user.id}'),
+                ],
+              ),
+              trailing: PopupMenuButton<String>(
+                onSelected: (action) {
+                  switch (action) {
+                    case 'edit':
+                      _showUserDialog(user: user);
+                      break;
+                    case 'delete':
+                      _deleteUser(user);
+                      break;
+                  }
+                },
+                itemBuilder: (context) => [
+                  const PopupMenuItem(
+                    value: 'edit',
+                    child: Row(
+                      children: [
+                        Icon(Icons.edit),
+                        SizedBox(width: 8),
+                        Text('编辑'),
+                      ],
+                    ),
+                  ),
+                  const PopupMenuItem(
+                    value: 'delete',
+                    child: Row(
+                      children: [
+                        Icon(Icons.delete, color: Colors.red),
+                        SizedBox(width: 8),
+                        Text('删除', style: TextStyle(color: Colors.red)),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              onTap: () => _showUserDetails(user),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  /// 显示用户详情
+  void _showUserDetails(User user) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(user.name),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.network(
+                user.avatar,
+                width: double.infinity,
+                height: 200,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    width: double.infinity,
+                    height: 200,
+                    color: Colors.grey[300],
+                    child: const Icon(Icons.error, size: 50),
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text('🆔 ID: ${user.id}'),
+            const SizedBox(height: 8),
+            Text('👤 姓名: ${user.name}'),
+            const SizedBox(height: 8),
+            Text('🏙️ 城市: ${user.city}'),
+            const SizedBox(height: 16),
+            const Text('JSON 数据:', style: TextStyle(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.grey[100],
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                user.toJsonString(),
+                style: const TextStyle(fontFamily: 'monospace'),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('关闭'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _showUserDialog(user: user);
+            },
+            child: const Text('编辑'),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
-/// 清理资源
-void _cleanup() {
-  print('🧹 清理资源');
-  print('============');
+/// 自定义拦截器
+class _CustomInterceptor extends Interceptor {
+  @override
+  Future<AxiosRequest> onRequest(AxiosRequest request) async {
+    print('📤 ${request.method} ${request.url}');
+    if (request.data != null) {
+      print('   📦 请求数据: ${request.data}');
+    }
+    return request;
+  }
 
-  ApiService().close();
-  print('✅ API 服务已关闭');
+  @override
+  Future<AxiosResponse<dynamic>> onResponse(AxiosResponse<dynamic> response) async {
+    print('📥 ${response.status} ${response.request.url}');
+    final dataStr = response.data.toString();
+    final preview = dataStr.length > 100 ? '${dataStr.substring(0, 100)}...' : dataStr;
+    print('   📦 响应数据: $preview');
+    return response;
+  }
+
+  @override
+  Future<void> onError(AxiosError error) async {
+    print('❌ 请求错误: ${error.response?.status} ${error.message}');
+  }
 }
