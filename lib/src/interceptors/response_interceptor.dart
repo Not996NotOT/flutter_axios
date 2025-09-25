@@ -44,7 +44,7 @@ class LoggingResponseInterceptor extends Interceptor {
     if (response.data != null) {
       logger('📦 Data: ${response.data}');
     }
-    
+
     return response;
   }
 
@@ -81,10 +81,10 @@ class RetryInterceptor extends Interceptor {
     if (shouldRetry != null) {
       return shouldRetry!(error);
     }
-    
+
     // Default retry logic: retry on network errors and 5xx responses
-    return error.isNetworkError || 
-           error.isTimeoutError ||
-           (error.response != null && error.response!.status >= 500);
+    return error.isNetworkError ||
+        error.isTimeoutError ||
+        (error.response != null && error.response!.status >= 500);
   }
 }

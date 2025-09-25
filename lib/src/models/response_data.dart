@@ -4,16 +4,16 @@ import '../types/types.dart';
 class ResponseData {
   /// Response body data
   final dynamic data;
-  
+
   /// HTTP status code
   final int status;
-  
+
   /// Status text
   final String statusText;
-  
+
   /// Response headers
   final Headers headers;
-  
+
   /// Request configuration that produced this response
   final Map<String, dynamic>? config;
 

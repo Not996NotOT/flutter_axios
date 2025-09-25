@@ -1,5 +1,7 @@
 # Flutter Axios
 
+> **文档语言**: [English](README.md) | [中文](README_CN.md) | [日本語](README_JP.md)
+
 一个强大的 Flutter HTTP 客户端，灵感来自 Axios.js，具有革命性的 JSON 映射和 build_runner 集成。
 
 [![pub package](https://img.shields.io/pub/v/flutter_axios.svg)](https://pub.dev/packages/flutter_axios)
@@ -32,7 +34,7 @@
 
 ```yaml
 dependencies:
-  flutter_axios: ^1.1.1
+  flutter_axios: ^1.1.4
 
 dev_dependencies:
   build_runner: ^2.4.12

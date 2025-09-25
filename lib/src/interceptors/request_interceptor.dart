@@ -30,7 +30,7 @@ class AuthInterceptor extends Interceptor {
   FutureOr<AxiosRequest> onRequest(AxiosRequest request) {
     final newHeaders = Map<String, String>.from(request.headers);
     newHeaders[headerName] = 'Bearer $token';
-    
+
     return request.copyWith(headers: newHeaders);
   }
 }
@@ -45,7 +45,7 @@ class HeadersInterceptor extends Interceptor {
   FutureOr<AxiosRequest> onRequest(AxiosRequest request) {
     final newHeaders = Map<String, String>.from(request.headers);
     newHeaders.addAll(headers);
-    
+
     return request.copyWith(headers: newHeaders);
   }
 }
@@ -60,7 +60,8 @@ class LoggingRequestInterceptor extends Interceptor {
 
   @override
   FutureOr<AxiosRequest> onRequest(AxiosRequest request) {
-    logger('🚀 Request: ${request.method.name.toUpperCase()} ${request.fullUrl}');
+    logger(
+        '🚀 Request: ${request.method.name.toUpperCase()} ${request.fullUrl}');
     if (request.headers.isNotEmpty) {
       logger('📋 Headers: ${request.headers}');
     }
@@ -70,7 +71,7 @@ class LoggingRequestInterceptor extends Interceptor {
     if (request.data != null) {
       logger('📦 Data: ${request.data}');
     }
-    
+
     return request;
   }
 }

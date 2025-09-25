@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:http/http.dart' as http;
 
@@ -17,17 +16,17 @@ import 'types/types.dart';
 class AxiosInstance {
   /// Instance configuration
   final AxiosConfig config;
-  
+
   /// HTTP client for making requests
   final http.Client _client;
-  
+
   /// Interceptor manager
   final InterceptorManager _interceptors = InterceptorManager();
 
   AxiosInstance({
     AxiosConfig? config,
     http.Client? client,
-  }) : config = config ?? const AxiosConfig(),
+  })  : config = config ?? const AxiosConfig(),
         _client = client ?? http.Client();
 
   /// Get interceptors manager
@@ -171,23 +170,23 @@ class AxiosInstance {
     try {
       // Create the request
       var request = AxiosRequest.fromOptions(options, baseURL: config.baseURL);
-      
+
       // Apply config defaults
       request = _applyConfigDefaults(request);
-      
+
       // Process through request interceptors
       request = await _interceptors.processRequest(request);
-      
+
       // Execute the request
       final response = await _executeRequest<T>(request);
-      
+
       // Process through response interceptors
       final processedResponse = await _interceptors.processResponse(response);
-      
+
       return processedResponse as AxiosResponse<T>;
     } catch (error) {
       AxiosError axiosError;
-      
+
       if (error is AxiosError) {
         axiosError = error;
       } else if (error is TimeoutException) {
@@ -196,9 +195,9 @@ class AxiosInstance {
           request: AxiosRequest.fromOptions(options, baseURL: config.baseURL),
           cause: error,
         );
-      } else if (error is SocketException) {
+      } else if (_isNetworkError(error)) {
         axiosError = AxiosError.network(
-          message: 'Network error: ${error.message}',
+          message: 'Network error: ${error.toString()}',
           request: AxiosRequest.fromOptions(options, baseURL: config.baseURL),
           cause: error,
         );
@@ -209,10 +208,10 @@ class AxiosInstance {
           cause: error,
         );
       }
-      
+
       // Process through error interceptors
       await _interceptors.processError(axiosError);
-      
+
       throw axiosError;
     }
   }
@@ -220,15 +219,15 @@ class AxiosInstance {
   /// Apply config defaults to the request
   AxiosRequest _applyConfigDefaults(AxiosRequest request) {
     final mergedHeaders = <String, String>{};
-    
+
     // Add config headers
     if (config.headers != null) {
       mergedHeaders.addAll(config.headers!);
     }
-    
+
     // Add request headers (they override config headers)
     mergedHeaders.addAll(request.headers);
-    
+
     // Merge params
     final mergedParams = <String, dynamic>{};
     if (config.params != null) {
@@ -237,7 +236,7 @@ class AxiosInstance {
     if (request.params != null) {
       mergedParams.addAll(request.params!);
     }
-    
+
     return request.copyWith(
       headers: mergedHeaders,
       params: mergedParams.isNotEmpty ? mergedParams : null,
@@ -250,7 +249,7 @@ class AxiosInstance {
   Future<AxiosResponse<T>> _executeRequest<T>(AxiosRequest request) async {
     final uri = _buildUri(request);
     final headers = Map<String, String>.from(request.headers);
-    
+
     // Set default content type for requests with body
     if (_hasBody(request.method) && request.data != null) {
       headers.putIfAbsent('content-type', () => 'application/json');
@@ -261,7 +260,7 @@ class AxiosInstance {
 
     try {
       Future<http.Response> requestFuture;
-      
+
       switch (request.method) {
         case HttpMethod.get:
           requestFuture = _client.get(uri, headers: headers);
@@ -312,12 +311,15 @@ class AxiosInstance {
         message: 'Request timeout after ${timeout?.inMilliseconds}ms',
         request: request,
       );
-    } on SocketException catch (e) {
-      throw AxiosError.network(
-        message: 'Network error: ${e.message}',
-        request: request,
-        cause: e,
-      );
+    } catch (e) {
+      if (_isNetworkError(e)) {
+        throw AxiosError.network(
+          message: 'Network error: ${e.toString()}',
+          request: request,
+          cause: e,
+        );
+      }
+      rethrow;
     }
 
     // Create the response
@@ -327,7 +329,7 @@ class AxiosInstance {
     });
 
     final data = _parseResponseData<T>(httpResponse.body, responseHeaders);
-    
+
     final response = AxiosResponse<T>(
       data: data,
       status: httpResponse.statusCode,
@@ -338,7 +340,9 @@ class AxiosInstance {
     );
 
     // Validate status
-    final validateStatus = request.validateStatus ?? config.validateStatus ?? AxiosConfig.defaultValidateStatus;
+    final validateStatus = request.validateStatus ??
+        config.validateStatus ??
+        AxiosConfig.defaultValidateStatus;
     if (!validateStatus(response.status)) {
       throw AxiosError.response(
         message: 'Request failed with status ${response.status}',
@@ -354,16 +358,16 @@ class AxiosInstance {
   Uri _buildUri(AxiosRequest request) {
     final url = request.fullUrl;
     final uri = Uri.parse(url);
-    
+
     if (request.params == null || request.params!.isEmpty) {
       return uri;
     }
-    
+
     final queryParams = <String, String>{};
     request.params!.forEach((key, value) {
       queryParams[key] = value.toString();
     });
-    
+
     return uri.replace(queryParameters: {
       ...uri.queryParameters,
       ...queryParams,
@@ -373,13 +377,14 @@ class AxiosInstance {
   /// Encode request body
   String? _encodeBody(RequestData? data, Headers headers) {
     if (data == null) return null;
-    
-    final contentType = headers['content-type']?.toLowerCase() ?? 'application/json';
-    
+
+    final contentType =
+        headers['content-type']?.toLowerCase() ?? 'application/json';
+
     if (data is String) {
       return data;
     }
-    
+
     if (contentType.contains('application/json')) {
       try {
         // 尝试使用 build_runner 生成的 JsonMapper 序列化
@@ -390,15 +395,16 @@ class AxiosInstance {
         return jsonEncode(data);
       }
     }
-    
+
     if (contentType.contains('application/x-www-form-urlencoded')) {
       if (data is Map<String, dynamic>) {
         return data.entries
-            .map((e) => '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value.toString())}')
+            .map((e) =>
+                '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value.toString())}')
             .join('&');
       }
     }
-    
+
     return data.toString();
   }
 
@@ -407,9 +413,9 @@ class AxiosInstance {
     if (body.isEmpty) {
       return null as T;
     }
-    
+
     final contentType = headers['content-type']?.toLowerCase() ?? '';
-    
+
     // 处理 JSON 内容
     if (contentType.contains('application/json')) {
       try {
@@ -418,7 +424,7 @@ class AxiosInstance {
         if (result != null) {
           return result;
         }
-        
+
         // 回退到基础 JSON 解析
         final decoded = jsonDecode(body);
         if (T == dynamic) {
@@ -427,7 +433,7 @@ class AxiosInstance {
         if (T == String) {
           return body as T;
         }
-        
+
         // 尝试类型转换
         return decoded as T;
       } catch (e) {
@@ -435,7 +441,7 @@ class AxiosInstance {
         return body as T;
       }
     }
-    
+
     // 非 JSON 内容直接返回
     return body as T;
   }
@@ -443,8 +449,18 @@ class AxiosInstance {
   /// Check if method can have a body
   bool _hasBody(HttpMethod method) {
     return method == HttpMethod.post ||
-           method == HttpMethod.put ||
-           method == HttpMethod.patch;
+        method == HttpMethod.put ||
+        method == HttpMethod.patch;
+  }
+
+  /// Check if error is a network error (cross-platform)
+  bool _isNetworkError(dynamic error) {
+    // Check for SocketException on non-web platforms
+    if (error.runtimeType.toString() == 'SocketException') {
+      return true;
+    }
+    // Additional web-specific network error checks can be added here
+    return false;
   }
 
   /// Create a new instance with merged configuration

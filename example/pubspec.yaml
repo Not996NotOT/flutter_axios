@@ -11,6 +11,8 @@ dependencies:
   flutter_axios:
     path: ../
 
+publish_to: none
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -7,25 +7,33 @@ import '../axios_response.dart';
 enum HttpMethod {
   /// GET method for retrieving data
   get,
+
   /// POST method for creating data
   post,
+
   /// PUT method for updating data
   put,
+
   /// PATCH method for partial updates
   patch,
+
   /// DELETE method for removing data
   delete,
+
   /// HEAD method for retrieving headers only
   head,
+
   /// OPTIONS method for retrieving allowed methods
   options,
 }
 
 /// Request interceptor function type
-typedef RequestInterceptorFunction = FutureOr<AxiosRequest> Function(AxiosRequest request);
+typedef RequestInterceptorFunction = FutureOr<AxiosRequest> Function(
+    AxiosRequest request);
 
 /// Response interceptor function type
-typedef ResponseInterceptorFunction = FutureOr<AxiosResponse<dynamic>> Function(AxiosResponse<dynamic> response);
+typedef ResponseInterceptorFunction = FutureOr<AxiosResponse<dynamic>> Function(
+    AxiosResponse<dynamic> response);
 
 /// Error interceptor function type
 typedef ErrorInterceptorFunction = FutureOr<void> Function(dynamic error);
@@ -43,10 +51,12 @@ typedef Headers = Map<String, String>;
 typedef QueryParameters = Map<String, dynamic>;
 
 /// Transform request function type
-typedef TransformRequest = RequestData Function(RequestData data, Headers headers);
+typedef TransformRequest = RequestData Function(
+    RequestData data, Headers headers);
 
-/// Transform response function type  
-typedef TransformResponse = ResponseData Function(ResponseData data, Headers headers);
+/// Transform response function type
+typedef TransformResponse = ResponseData Function(
+    ResponseData data, Headers headers);
 
 /// Progress callback for uploads/downloads
 typedef ProgressCallback = void Function(int count, int total);

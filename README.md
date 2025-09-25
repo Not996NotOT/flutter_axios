@@ -1,5 +1,7 @@
 # Flutter Axios
 
+> **Documentation Languages**: [English](README.md) | [中文](README_CN.md) | [日本語](README_JP.md)
+
 A powerful HTTP client for Flutter inspired by Axios.js, featuring revolutionary JSON mapping with build_runner integration.
 
 [![pub package](https://img.shields.io/pub/v/flutter_axios.svg)](https://pub.dev/packages/flutter_axios)
@@ -32,7 +34,7 @@ Add to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  flutter_axios: ^1.1.1
+  flutter_axios: ^1.1.4
 
 dev_dependencies:
   build_runner: ^2.4.12

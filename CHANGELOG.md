@@ -5,6 +5,58 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.4] - 2025-09-25
+
+### Added
+- **多言語ドキュメント対応** 🌐
+  - 日本語版 README (README_JP.md) を追加
+  - 全 README ファイルに言語切替ナビゲーションを追加
+  - English ↔ 中文 ↔ 日本語 の相互リンク対応
+
+### Enhanced
+- **文档国际化** 📚
+  - 创建完整的日文文档 README_JP.md
+  - 在所有 README 文件头部添加语言切换入口
+  - 支持英文、中文、日文三种语言相互跳转
+  - 统一的文档结构和风格
+
+### Documentation
+- **Language Navigation** 🔗
+  - Added language switcher to all README files
+  - Seamless navigation between English, Chinese, and Japanese docs
+  - Consistent documentation structure across all languages
+
+## [1.1.3] - 2025-09-25
+
+### Fixed
+- **Web Platform Support** 🌐
+  - Added conditional imports for cross-platform compatibility
+  - Removed dart:io dependency that was blocking Web support
+  - Enhanced network error handling for Web environments
+  
+### Improved
+- **Package Score Optimization** 📈
+  - Updated dependencies to latest compatible versions
+  - Fixed code formatting issues with dart format
+  - Fixed documentation comments (removed dangling library docs)
+  - Added comprehensive test coverage (15 test cases)
+  - Improved static analysis score to reduce warnings
+
+### Enhanced Testing
+- **Comprehensive Test Suite** ✅ 
+  - Added 15 test cases covering core functionality
+  - Mock-based testing with http client mocking
+  - Tests for GET, POST, PUT, DELETE methods
+  - Error handling and timeout scenario tests
+  - Configuration merging and validation tests
+  - AxiosError creation and type validation tests
+
+### Fixed Examples
+- **Updated Flutter Example** 📱
+  - Fixed widget tests to match actual app functionality
+  - Improved user interface testing scenarios
+  - Better test coverage for dialog interactions
+
 ## [1.1.2] - 2025-09-25
 
 ### Added

@@ -40,17 +40,14 @@ class User {
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     return other is User &&
-           other.id == id &&
-           other.name == name &&
-           other.avatar == avatar &&
-           other.city == city;
+        other.id == id &&
+        other.name == name &&
+        other.avatar == avatar &&
+        other.city == city;
   }
 
   @override
   int get hashCode {
-    return id.hashCode ^ 
-           name.hashCode ^ 
-           avatar.hashCode ^ 
-           city.hashCode;
+    return id.hashCode ^ name.hashCode ^ avatar.hashCode ^ city.hashCode;
   }
 }

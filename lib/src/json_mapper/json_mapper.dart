@@ -1,20 +1,20 @@
-/// Flutter Axios JSON 映射器核心
-/// 专为 build_runner 代码生成设计
+/// Flutter Axios JSON 映射器核心.
+/// 专为 build_runner 代码生成设计.
 library json_mapper;
 
 import 'dart:convert';
 
-/// JSON 序列化注解
-/// 标记类需要生成 JSON 映射代码
+/// JSON 序列化注解.
+/// 标记类需要生成 JSON 映射代码.
 class AxiosJson {
   const AxiosJson();
 }
 
-/// JSON 序列化注解实例
+/// JSON 序列化注解实例.
 const axiosJson = AxiosJson();
 
-/// JSON 映射器核心类
-/// 管理类型注册和序列化/反序列化
+/// JSON 映射器核心类.
+/// 管理类型注册和序列化/反序列化.
 class JsonMapper {
   /// 类型处理器映射
   static final Map<Type, Function> _fromJsonHandlers = {};
@@ -124,7 +124,7 @@ class JsonMapper {
         final match = RegExp(r'List<(.+)>').firstMatch(typeString);
         if (match != null) {
           final elementTypeName = match.group(1)!;
-          
+
           // 处理基础类型列表
           if (elementTypeName == 'String') {
             return json.map((e) => e.toString()).toList() as T;
@@ -141,7 +141,7 @@ class JsonMapper {
           if (elementTypeName == 'dynamic') {
             return json.map((e) => e).toList() as T;
           }
-          
+
           // 复杂类型列表需要递归处理
           // 这里返回原始列表，让生成的代码处理具体类型转换
           return json as T;
@@ -163,7 +163,6 @@ class JsonMapper {
       return fromJsonHandler(json) as T?;
     }
 
-
     return null;
   }
 
@@ -184,8 +183,8 @@ class JsonMapper {
   }
 }
 
-/// 初始化 JSON 映射器
-/// 必须在使用前调用一次
+/// 初始化 JSON 映射器.
+/// 必须在使用前调用一次.
 void initializeJsonMapper() {
   // 确保映射器已初始化
   // 清除可能存在的旧注册

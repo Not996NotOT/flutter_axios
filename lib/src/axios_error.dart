@@ -5,16 +5,16 @@ import 'axios_response.dart';
 enum AxiosErrorType {
   /// Network error (no internet, DNS failure, etc.)
   network,
-  
+
   /// Request timeout
   timeout,
-  
+
   /// Request was cancelled
   cancelled,
-  
+
   /// HTTP error response (4xx, 5xx)
   response,
-  
+
   /// Unknown error
   unknown,
 }
@@ -23,19 +23,19 @@ enum AxiosErrorType {
 class AxiosError implements Exception {
   /// Error message
   final String message;
-  
+
   /// Error type
   final AxiosErrorType type;
-  
+
   /// The request that caused the error
   final AxiosRequest? request;
-  
+
   /// The response (if any) that caused the error
   final AxiosResponse<dynamic>? response;
-  
+
   /// The underlying error (if any)
   final dynamic cause;
-  
+
   /// Error code (optional)
   final String? code;
 

@@ -5,19 +5,19 @@ import 'types/types.dart';
 class AxiosResponse<T> {
   /// Response data (parsed)
   final T data;
-  
+
   /// HTTP status code
   final int status;
-  
+
   /// HTTP status message
   final String statusText;
-  
+
   /// Response headers
   final Headers headers;
-  
+
   /// The request configuration that produced this response
   final AxiosRequest request;
-  
+
   /// Raw response data (before parsing)
   final String? rawData;
 
@@ -36,7 +36,7 @@ class AxiosResponse<T> {
   /// Whether the response indicates a client error
   bool get isClientError => status >= 400 && status < 500;
 
-  /// Whether the response indicates a server error  
+  /// Whether the response indicates a server error
   bool get isServerError => status >= 500;
 
   /// Whether the response indicates an error

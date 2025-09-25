@@ -5,40 +5,40 @@ import 'types/types.dart';
 class AxiosRequest {
   /// Request URL (can be relative or absolute)
   final String url;
-  
+
   /// HTTP method
   final HttpMethod method;
-  
+
   /// Request headers
   final Headers headers;
-  
+
   /// Query parameters
   final QueryParameters? params;
-  
+
   /// Request body data
   final RequestData? data;
-  
+
   /// Request timeout
   final Duration? timeout;
-  
+
   /// Base URL for resolving relative URLs
   final String? baseURL;
-  
+
   /// Upload progress callback
   final ProgressCallback? onUploadProgress;
-  
+
   /// Download progress callback
   final ProgressCallback? onDownloadProgress;
-  
+
   /// Custom status validator
   final ValidateStatus? validateStatus;
-  
+
   /// Whether to follow redirects
   final bool followRedirects;
-  
+
   /// Maximum redirects to follow
   final int maxRedirects;
-  
+
   /// Expected response type
   final String? responseType;
 
@@ -82,8 +82,10 @@ class AxiosRequest {
     if (baseURL == null || url.startsWith('http')) {
       return url;
     }
-    
-    final base = baseURL!.endsWith('/') ? baseURL!.substring(0, baseURL!.length - 1) : baseURL!;
+
+    final base = baseURL!.endsWith('/')
+        ? baseURL!.substring(0, baseURL!.length - 1)
+        : baseURL!;
     final path = url.startsWith('/') ? url : '/$url';
     return '$base$path';
   }

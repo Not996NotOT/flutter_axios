@@ -11,7 +11,7 @@ import 'models/user.flutter_axios.g.dart';
 void main() {
   // 🎉 One-line initialization for all JSON mappers!
   initializeAllAxiosJsonMappers();
-  
+
   runApp(const MyApp());
 }
 
@@ -41,17 +41,17 @@ class UserManagementPage extends StatefulWidget {
 class _UserManagementPageState extends State<UserManagementPage> {
   // Axios 实例
   late final AxiosInstance _axios;
-  
+
   // 用户列表
   List<User> _users = [];
   bool _isLoading = false;
   bool _isInitialized = false;
-  
+
   // 表单控制器
   final _nameController = TextEditingController();
   final _avatarController = TextEditingController();
   final _cityController = TextEditingController();
-  
+
   @override
   void initState() {
     super.initState();
@@ -78,7 +78,7 @@ class _UserManagementPageState extends State<UserManagementPage> {
     setState(() {
       _isInitialized = true;
     });
-    
+
     // Load data immediately after initialization
     _loadUsers();
   }
@@ -86,23 +86,25 @@ class _UserManagementPageState extends State<UserManagementPage> {
   /// Load user list
   Future<void> _loadUsers() async {
     if (!_isInitialized) return;
-    
+
     setState(() {
       _isLoading = true;
     });
 
     try {
       final response = await _axios.get('/user');
-      
+
       // Parse user list
       List<User> users = [];
       if (response.data is List) {
         final rawList = response.data as List;
-        users = rawList.map((item) => 
-          UserJsonFactory.fromMap(item as Map<String, dynamic>)
-        ).whereType<User>().toList();
+        users = rawList
+            .map(
+                (item) => UserJsonFactory.fromMap(item as Map<String, dynamic>))
+            .whereType<User>()
+            .toList();
       }
-      
+
       setState(() {
         _users = users;
       });
@@ -119,8 +121,8 @@ class _UserManagementPageState extends State<UserManagementPage> {
 
   /// Create new user
   Future<void> _createUser() async {
-    if (_nameController.text.isEmpty || 
-        _avatarController.text.isEmpty || 
+    if (_nameController.text.isEmpty ||
+        _avatarController.text.isEmpty ||
         _cityController.text.isEmpty) {
       _showErrorSnackBar('Please fill in all fields');
       return;
@@ -135,7 +137,7 @@ class _UserManagementPageState extends State<UserManagementPage> {
       );
 
       final response = await _axios.post<User>('/user', data: newUser);
-      
+
       final createdUser = response.data;
       if (createdUser != null) {
         setState(() {
@@ -155,13 +157,18 @@ class _UserManagementPageState extends State<UserManagementPage> {
   Future<void> _updateUser(User user) async {
     try {
       final updatedUser = user.copyWith(
-        name: _nameController.text.isNotEmpty ? _nameController.text : user.name,
-        avatar: _avatarController.text.isNotEmpty ? _avatarController.text : user.avatar,
-        city: _cityController.text.isNotEmpty ? _cityController.text : user.city,
+        name:
+            _nameController.text.isNotEmpty ? _nameController.text : user.name,
+        avatar: _avatarController.text.isNotEmpty
+            ? _avatarController.text
+            : user.avatar,
+        city:
+            _cityController.text.isNotEmpty ? _cityController.text : user.city,
       );
 
-      final response = await _axios.put<User>('/user/${user.id}', data: updatedUser);
-      
+      final response =
+          await _axios.put<User>('/user/${user.id}', data: updatedUser);
+
       final updatedUserData = response.data;
       if (updatedUserData != null) {
         final index = _users.indexWhere((u) => u.id == user.id);
@@ -187,7 +194,7 @@ class _UserManagementPageState extends State<UserManagementPage> {
 
     try {
       await _axios.delete<void>('/user/${user.id}');
-      
+
       setState(() {
         _users.removeWhere((u) => u.id == user.id);
       });
@@ -418,8 +425,9 @@ class _UserManagementPageState extends State<UserManagementPage> {
               leading: CircleAvatar(
                 backgroundImage: NetworkImage(user.avatar),
                 onBackgroundImageError: (_, __) {},
-                child: user.avatar.isEmpty 
-                    ? Text(user.name.isNotEmpty ? user.name[0].toUpperCase() : '?')
+                child: user.avatar.isEmpty
+                    ? Text(
+                        user.name.isNotEmpty ? user.name[0].toUpperCase() : '?')
                     : null,
               ),
               title: Text(
@@ -509,7 +517,8 @@ class _UserManagementPageState extends State<UserManagementPage> {
             const SizedBox(height: 8),
             Text('🏙️ City: ${user.city}'),
             const SizedBox(height: 16),
-            const Text('JSON Data:', style: TextStyle(fontWeight: FontWeight.bold)),
+            const Text('JSON Data:',
+                style: TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             Container(
               padding: const EdgeInsets.all(12),
@@ -554,10 +563,12 @@ class _CustomInterceptor extends Interceptor {
   }
 
   @override
-  Future<AxiosResponse<dynamic>> onResponse(AxiosResponse<dynamic> response) async {
+  Future<AxiosResponse<dynamic>> onResponse(
+      AxiosResponse<dynamic> response) async {
     print('📥 ${response.status} ${response.request.url}');
     final dataStr = response.data.toString();
-    final preview = dataStr.length > 100 ? '${dataStr.substring(0, 100)}...' : dataStr;
+    final preview =
+        dataStr.length > 100 ? '${dataStr.substring(0, 100)}...' : dataStr;
     print('   📦 Response data: $preview');
     return response;
   }
