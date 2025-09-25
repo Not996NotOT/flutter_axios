@@ -1,8 +1,109 @@
 /// 最小化的 build_runner 代码生成器
 /// 专注于核心功能，避免复杂的列表处理
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:build/build.dart';
+import 'package:glob/glob.dart';
+
+/// 全局初始化文件生成器
+class GlobalInitializerBuilder implements Builder {
+  @override
+  Map<String, List<String>> get buildExtensions => {
+    r'$lib$': ['axios_json_initializers.g.dart']
+  };
+
+  @override
+  Future<void> build(BuildStep buildStep) async {
+    final allAssets = await buildStep.findAssets(Glob('lib/**/*.dart')).toList();
+    final classNames = <String>[];
+    
+    // 扫描所有 Dart 文件，找到带有 @AxiosJson() 注解的类
+    for (final asset in allAssets) {
+      final content = await buildStep.readAsString(asset);
+      if (content.contains('@AxiosJson()')) {
+        final classRegex = RegExp(r'class\s+(\w+)\s*{');
+        final matches = classRegex.allMatches(content);
+        for (final match in matches) {
+          final className = match.group(1)!;
+          if (!classNames.contains(className)) {
+            classNames.add(className);
+          }
+        }
+      }
+    }
+    
+    if (classNames.isEmpty) return;
+    
+    // 生成全局初始化代码
+    final code = _generateGlobalInitializer(classNames);
+    final outputId = AssetId(buildStep.inputId.package, 'lib/axios_json_initializers.g.dart');
+    await buildStep.writeAsString(outputId, code);
+    
+    log.info('Generated global initializer for ${classNames.length} classes: ${classNames.join(", ")}');
+  }
+
+  String _generateGlobalInitializer(List<String> classNames) {
+    final buffer = StringBuffer();
+    
+    buffer.writeln('// GENERATED CODE - DO NOT MODIFY BY HAND');
+    buffer.writeln('// Global Axios JSON Initializer');
+    buffer.writeln('// Generated on: ${DateTime.now().toIso8601String()}');
+    buffer.writeln();
+    
+    // 导入所有模型类和生成的文件
+    for (final className in classNames) {
+      final snakeCase = _camelToSnake(className);
+      buffer.writeln('import \'models/${snakeCase}.dart\';');
+      buffer.writeln('import \'models/${snakeCase}.flutter_axios.g.dart\';');
+    }
+    buffer.writeln();
+    
+    // 生成初始化所有映射器的函数
+    buffer.writeln('/// 一键初始化所有 Axios JSON 映射器');
+    buffer.writeln('/// 无需手动调用每个类的初始化函数');
+    buffer.writeln('void initializeAllAxiosJsonMappers() {');
+    for (final className in classNames) {
+      buffer.writeln('  initialize${className}JsonMappers();');
+    }
+    buffer.writeln('}');
+    buffer.writeln();
+    
+    // 生成按类型初始化的函数
+    buffer.writeln('/// 按类型列表初始化 JSON 映射器');
+    buffer.writeln('/// 使用方式: initializeAxiosJsonMappers([User, Product])');
+    buffer.writeln('void initializeAxiosJsonMappers(List<Type> types) {');
+    buffer.writeln('  for (final type in types) {');
+    buffer.writeln('    switch (type) {');
+    for (final className in classNames) {
+      buffer.writeln('      case $className:');
+      buffer.writeln('        initialize${className}JsonMappers();');
+      buffer.writeln('        break;');
+    }
+    buffer.writeln('      default:');
+    buffer.writeln('        print(\'警告: 未找到类型 \${type} 的 JSON 映射器\');');
+    buffer.writeln('    }');
+    buffer.writeln('  }');
+    buffer.writeln('}');
+    buffer.writeln();
+    
+    // 生成类型映射表
+    buffer.writeln('/// 支持的类型列表');
+    buffer.writeln('final supportedAxiosJsonTypes = <Type>[');
+    for (final className in classNames) {
+      buffer.writeln('  $className,');
+    }
+    buffer.writeln('];');
+    
+    return buffer.toString();
+  }
+
+  String _camelToSnake(String camelCase) {
+    return camelCase
+        .replaceAllMapped(RegExp(r'[A-Z]'), (match) => '_${match.group(0)!.toLowerCase()}')
+        .substring(1); // 移除开头的下划线
+  }
+}
 
 /// 最小化 JSON 生成器
 class MinimalJsonBuilder implements Builder {
@@ -277,3 +378,4 @@ class _FieldInfo {
 
 /// 构建器工厂
 Builder minimalJsonBuilder(BuilderOptions options) => MinimalJsonBuilder();
+Builder globalInitializerBuilder(BuilderOptions options) => GlobalInitializerBuilder();

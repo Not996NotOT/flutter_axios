@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.2] - 2025-09-25
+
+### Added
+- **Revolutionary Auto-Initialization System** 🚀
+  - One-line initialization: `initializeAllAxiosJsonMappers()`
+  - Type-specific initialization: `initializeAxiosJsonMappers([User, Product])`
+  - Auto-generated global initializer file: `axios_json_initializers.g.dart`
+  - No more manual initialization for each model class
+  - Supports 100+ models with single function call
+
+### Enhanced
+- **Global Initializer Builder** - Automatically scans and generates initialization code
+- **Type-Safe Initialization** - Compile-time checks for supported types
+- **Flexible Options** - Choose between all-at-once or selective initialization
+- **Zero Boilerplate** - From 50+ lines to 1 line of initialization code
+
 ## [1.1.1] - 2025-09-25
 
 ### Changed

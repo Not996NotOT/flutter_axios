@@ -7,6 +7,11 @@ targets:
         generate_for:
           - lib/**
           - example/lib/**
+      flutter_axios|global_initializer:
+        enabled: true
+        generate_for:
+          - lib/**
+          - example/lib/**
 
 builders:
   json_serializable:
@@ -14,5 +19,13 @@ builders:
     builder_factories: ["minimalJsonBuilder"]
     build_extensions: 
       ".dart": [".flutter_axios.g.dart"]
+    auto_apply: dependents
+    build_to: source
+  
+  global_initializer:
+    import: "package:flutter_axios/src/json_mapper/minimal_build_runner.dart"
+    builder_factories: ["globalInitializerBuilder"]
+    build_extensions: 
+      "$lib$": ["axios_json_initializers.g.dart"]
     auto_apply: dependents
     build_to: source

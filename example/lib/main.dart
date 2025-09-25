@@ -5,12 +5,12 @@ import 'package:flutter_axios/flutter_axios.dart';
 
 // 导入模型和生成的映射代码
 import 'models/user.dart';
-import 'models/user.flutter_axios.g.dart';
+import 'models/product.dart';
+import 'axios_json_initializers.g.dart'; // 全局初始化器
 
 void main() {
-  // 初始化 JSON 映射器
-  initializeJsonMapper();
-  initializeUserJsonMappers();
+  // 🎉 一键初始化所有 JSON 映射器！
+  initializeAllAxiosJsonMappers();
   
   runApp(const MyApp());
 }

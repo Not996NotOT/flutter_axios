@@ -66,12 +66,11 @@ dart run build_runner build --delete-conflicting-outputs
 ```dart
 import 'package:flutter_axios/flutter_axios.dart';
 import 'models/user.dart';
-import 'models/user.flutter_axios.g.dart'; // 生成的文件
+import 'axios_json_initializers.g.dart'; // 全局初始化器
 
 void main() async {
-  // 初始化 JSON 映射器
-  initializeJsonMapper();
-  initializeUserJsonMappers();
+  // 🎉 一行代码初始化所有 JSON 映射器！
+  initializeAllAxiosJsonMappers();
   
   // 创建 HTTP 客户端
   final api = Axios.create(AxiosOptions(
@@ -85,6 +84,43 @@ void main() async {
   // 创建新用户
   final newUser = User(id: '1', name: 'John', email: 'john@example.com');
   await api.post<User>('/users', data: newUser); // 自动序列化！
+}
+```
+
+## 🔧 多种初始化选项
+
+### 选项一：初始化所有（推荐）
+```dart
+import 'axios_json_initializers.g.dart';
+
+void main() {
+  // 自动初始化所有 @AxiosJson() 类
+  initializeAllAxiosJsonMappers();
+  runApp(MyApp());
+}
+```
+
+### 选项二：初始化指定类型
+```dart
+import 'axios_json_initializers.g.dart';
+
+void main() {
+  // 只初始化你需要的特定类型
+  initializeAxiosJsonMappers([User, Product, Order]);
+  runApp(MyApp());
+}
+```
+
+### 选项三：手动初始化（传统方式）
+```dart
+import 'models/user.flutter_axios.g.dart';
+import 'models/product.flutter_axios.g.dart';
+
+void main() {
+  initializeJsonMapper();
+  initializeUserJsonMappers();
+  initializeProductJsonMappers();
+  runApp(MyApp());
 }
 ```
 

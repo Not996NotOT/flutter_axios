@@ -66,12 +66,11 @@ dart run build_runner build --delete-conflicting-outputs
 ```dart
 import 'package:flutter_axios/flutter_axios.dart';
 import 'models/user.dart';
-import 'models/user.flutter_axios.g.dart'; // Generated file
+import 'axios_json_initializers.g.dart'; // Global initializer
 
 void main() async {
-  // Initialize JSON mappers
-  initializeJsonMapper();
-  initializeUserJsonMappers();
+  // 🎉 One-line initialization for all JSON mappers!
+  initializeAllAxiosJsonMappers();
   
   // Create HTTP client
   final api = Axios.create(AxiosOptions(
@@ -85,6 +84,43 @@ void main() async {
   // Create new user
   final newUser = User(id: '1', name: 'John', email: 'john@example.com');
   await api.post<User>('/users', data: newUser); // Auto-serialized!
+}
+```
+
+## 🔧 Multiple Initialization Options
+
+### Option 1: Initialize All (Recommended)
+```dart
+import 'axios_json_initializers.g.dart';
+
+void main() {
+  // Initializes ALL @AxiosJson() classes automatically
+  initializeAllAxiosJsonMappers();
+  runApp(MyApp());
+}
+```
+
+### Option 2: Initialize Specific Types
+```dart
+import 'axios_json_initializers.g.dart';
+
+void main() {
+  // Only initialize specific types you need
+  initializeAxiosJsonMappers([User, Product, Order]);
+  runApp(MyApp());
+}
+```
+
+### Option 3: Manual Initialization (Legacy)
+```dart
+import 'models/user.flutter_axios.g.dart';
+import 'models/product.flutter_axios.g.dart';
+
+void main() {
+  initializeJsonMapper();
+  initializeUserJsonMappers();
+  initializeProductJsonMappers();
+  runApp(MyApp());
 }
 ```
 
