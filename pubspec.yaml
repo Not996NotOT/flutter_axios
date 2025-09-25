@@ -7,15 +7,14 @@ environment:
   sdk: '>=3.0.0 <4.0.0'
   flutter: ">=3.0.0"
 
-# 代码生成器配置
-executables:
-  flutter_axios_generator:
 
 dependencies:
   flutter:
     sdk: flutter
   http: ^1.2.1
   meta: ^1.9.0
+  build: ^3.1.0
+  glob: ^2.1.2
 
 dev_dependencies:
   flutter_test:

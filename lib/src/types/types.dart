@@ -5,12 +5,19 @@ import '../axios_response.dart';
 
 /// HTTP methods supported by Axios
 enum HttpMethod {
+  /// GET method for retrieving data
   get,
+  /// POST method for creating data
   post,
+  /// PUT method for updating data
   put,
+  /// PATCH method for partial updates
   patch,
+  /// DELETE method for removing data
   delete,
+  /// HEAD method for retrieving headers only
   head,
+  /// OPTIONS method for retrieving allowed methods
   options,
 }
 

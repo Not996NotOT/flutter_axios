@@ -35,6 +35,7 @@ class AxiosConfig {
   /// Whether to include credentials
   final bool? withCredentials;
 
+  /// Creates a new [AxiosConfig] with the specified options
   const AxiosConfig({
     this.baseURL,
     this.timeout,
