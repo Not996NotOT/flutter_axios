@@ -8,18 +8,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.1.1] - 2025-09-25
 
 ### Changed
-- **注解重命名**: `@JsonSerializable()` → `@AxiosJson()` 
-  - 避免与 `json_annotation` 包冲突
-  - 更简洁的 10 字符注解
-  - 明确表示这是 Flutter Axios 专用的 JSON 注解
-  - 保持所有原有功能不变
+- **Annotation Renamed**: `@JsonSerializable()` → `@AxiosJson()` 
+  - Avoid conflicts with `json_annotation` package
+  - More concise 10-character annotation
+  - Clearly indicates this is Flutter Axios specific JSON annotation
+  - Maintains all existing functionality
 
 ## [1.1.0] - 2025-09-25
 
 ### Added
 
 - **Revolutionary JSON Mapper System with build_runner Integration**
-  - Zero-code JSON serialization/deserialization with `@JsonSerializable()` annotation
+  - Zero-code JSON serialization/deserialization with `@AxiosJson()` annotation
   - Standard `build_runner` workflow with auto-generated `.flutter_axios.g.dart` files
   - 100% Flutter compatible (no dart:mirrors, pure compile-time generation)
   - Type-safe HTTP requests: `api.get<User>('/users/123')`

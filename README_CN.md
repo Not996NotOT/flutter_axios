@@ -1,42 +1,26 @@
 # Flutter Axios
 
-<div align="center">
+一个强大的 Flutter HTTP 客户端，灵感来自 Axios.js，具有革命性的 JSON 映射和 build_runner 集成。
 
 [![pub package](https://img.shields.io/pub/v/flutter_axios.svg)](https://pub.dev/packages/flutter_axios)
-[![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-[![Flutter](https://img.shields.io/badge/Flutter-3.0+-blue.svg)](https://flutter.dev)
+[![popularity](https://img.shields.io/pub/popularity/flutter_axios.svg)](https://pub.dev/packages/flutter_axios)
+[![likes](https://img.shields.io/pub/likes/flutter_axios.svg)](https://pub.dev/packages/flutter_axios)
 
-受 [Axios](https://axios-http.com/) 启发的 Flutter Promise 风格 HTTP 客户端。提供拦截器、请求/响应转换、错误处理和**革命性的自动 JSON 转换**功能。
+## ✨ 核心特性
 
-[English](README.md) | [中文](README_CN.md)
-
-</div>
-
-## ✨ 特性
-
-### 🚀 核心 HTTP 功能
-- **Promise 风格 API** - 熟悉的 Axios 语法
-- **请求/响应拦截器** - 强大的中间件系统
-- **自动请求/响应转换** - 内置 JSON 处理
-- **请求/响应超时** - 可配置的超时时间
-- **请求取消** - 使用 AbortController 取消请求
-- **错误处理** - 全面的错误类型和处理
-- **基础 URL 和相对 URL** - 灵活的 URL 管理
-- **查询参数** - 简单的查询字符串处理
-
-### 🎯 革命性 JSON 映射器
-- **零代码 JSON 转换** - 自动序列化/反序列化
-- **build_runner 集成** - 标准 Dart 代码生成
-- **类型安全的 HTTP 请求** - `api.get<User>('/users/123')`
-- **智能字段映射** - camelCase ↔ snake_case 转换
-- **复杂对象支持** - 嵌套对象、列表、映射
-- **Flutter 优化** - 无反射，纯编译时生成
-
-### 🛠️ 开发体验
-- **TypeScript 风格 API** - Web 开发者的熟悉体验
-- **热重载支持** - build_runner 的监听模式
-- **全面的文档** - 示例和指南
-- **单元测试** - 可靠且生产就绪
+- **🚀 零代码 JSON 映射** - 只需添加 `@AxiosJson()` 注解，无需样板代码
+- **🔧 build_runner 集成** - 标准 Dart 生态系统工具链
+- **🎯 类型安全请求** - `await api.get<User>('/users/123')`
+- **⚡ 10倍开发速度** - 每个模型 2-3 分钟 vs 20-30 分钟
+- **🔄 智能序列化** - 自动 camelCase ↔ snake_case 转换
+- **📱 Flutter 优化** - 无 dart:mirrors，仅编译时生成
+- **🌐 Promise 风格 API** - Web 开发者熟悉的 Axios.js 体验
+- **🛡️ 全面错误处理** - 网络、超时和 API 错误
+- **🔌 强大拦截器** - 请求/响应转换和日志记录
+- **🎨 TypeScript 风格 API** - Web 开发者的熟悉体验
+- **🔥 热重载支持** - build_runner 的监听模式
+- **📚 全面的文档** - 示例和指南
+- **✅ 单元测试** - 可靠且生产就绪
 
 ## 🚀 快速开始
 
@@ -48,591 +32,431 @@
 
 ```yaml
 dependencies:
-  flutter_axios: ^1.1.0
+  flutter_axios: ^1.1.1
 
 dev_dependencies:
-  build_runner: ^2.7.1  # 用于代码生成
+  build_runner: ^2.4.12
 ```
 
-### 基础用法
+### 步骤 1: 定义模型
+
+只需要添加一个注解：
 
 ```dart
 import 'package:flutter_axios/flutter_axios.dart';
 
-void main() async {
-  // 创建实例
-  final api = Axios.create(AxiosConfig(
-    baseURL: 'https://jsonplaceholder.typicode.com',
-    timeout: Duration(seconds: 10),
-  ));
-
-  try {
-    // GET 请求
-    final response = await api.get('/posts/1');
-    print(response.data);
-
-    // POST 请求
-    final newPost = await api.post('/posts', data: {
-      'title': 'foo',
-      'body': 'bar',
-      'userId': 1,
-    });
-    print('创建成功: ${newPost.data}');
-
-  } catch (e) {
-    if (e is AxiosError) {
-      print('错误: ${e.message}');
-      print('状态码: ${e.response?.statusCode}');
-    }
-  } finally {
-    api.close();
-  }
-}
-```
-
-## 🎯 自动 JSON 转换
-
-### 第一步：定义你的模型
-
-```dart
-// lib/models/user.dart
-import 'package:flutter_axios/flutter_axios.dart';
-
-@AxiosJson()
+@AxiosJson()  // 🎉 简洁的注解，避免框架冲突
 class User {
   final String id;
   final String name;
   final String email;
-  final int age;
-  final bool isActive;
-  final List<String> tags;
-  final Map<String, dynamic> profile;
-  final DateTime? createdAt;
-
-  const User({
-    required this.id,
-    required this.name,
-    required this.email,
-    required this.age,
-    required this.isActive,
-    required this.tags,
-    required this.profile,
-    this.createdAt,
-  });
-
-  // 只需要业务方法 - JSON 映射会自动生成！
-  User copyWith({
-    String? name,
-    String? email,
-    int? age,
-    bool? isActive,
-  }) {
-    return User(
-      id: id,
-      name: name ?? this.name,
-      email: email ?? this.email,
-      age: age ?? this.age,
-      isActive: isActive ?? this.isActive,
-      tags: tags,
-      profile: profile,
-      createdAt: createdAt,
-    );
-  }
-
-  @override
-  String toString() => 'User{id: $id, name: $name, email: $email}';
+  
+  const User({required this.id, required this.name, required this.email});
 }
 ```
 
-### 第二步：生成代码
+### 步骤 2: 生成代码
 
 ```bash
-# 一次性生成
 dart run build_runner build --delete-conflicting-outputs
-
-# 监听模式（开发时推荐）
-dart run build_runner watch --delete-conflicting-outputs
 ```
 
-这将生成 `user.flutter_axios.g.dart` 文件，包含：
-- 注册函数
-- 扩展方法 (toJsonString, toMap)
-- 工厂方法 (fromJsonString, fromMap)
-- 列表处理工具
-
-### 第三步：使用类型安全的 HTTP 请求
+### 步骤 3: 使用它
 
 ```dart
 import 'package:flutter_axios/flutter_axios.dart';
 import 'models/user.dart';
-import 'models/user.flutter_axios.g.dart';  // 导入生成的文件
+import 'models/user.flutter_axios.g.dart'; // 生成的文件
 
 void main() async {
   // 初始化 JSON 映射器
   initializeJsonMapper();
-  
-  // 注册你的模型（每个模型一行！）
   initializeUserJsonMappers();
   
   // 创建 HTTP 客户端
-  final api = Axios.create(AxiosConfig(
+  final api = Axios.create(AxiosOptions(
     baseURL: 'https://api.example.com',
   ));
-
-  // 🎉 享受类型安全的 HTTP 请求！
   
-  // GET 单个用户 - 自动反序列化
-  final userResponse = await api.get<User>('/users/123');
-  final user = userResponse.data;  // 已经是 User 对象！
-  print('欢迎 ${user.name}！');
-
-  // GET 用户列表 - 自动列表反序列化  
-  final usersResponse = await api.get<List<User>>('/users');
-  final users = usersResponse.data;  // 已经是 List<User>！
-  print('找到 ${users.length} 个用户');
-
-  // POST 新用户 - 自动序列化
-  final newUser = User(
-    id: 'new-id',
-    name: '张三',
-    email: 'zhangsan@example.com',
-    age: 30,
-    isActive: true,
-    tags: ['开发者'],
-    profile: {'技能': ['Flutter', 'Dart']},
-    createdAt: DateTime.now(),
-  );
-
-  final createResponse = await api.post<User>('/users', data: newUser);
-  print('创建用户: ${createResponse.data.name}');
-
-  // PUT 更新用户 - 自动序列化
-  final updatedUser = user.copyWith(name: '更新的名字');
-  await api.put<User>('/users/123', data: updatedUser);
-
-  // 使用生成的扩展方法
-  final jsonString = user.toJsonString();  // 序列化为 JSON 字符串
-  final userMap = user.toMap();           // 序列化为 Map
-
-  // 使用生成的工厂方法
-  final restoredUser = UserJsonFactory.fromJsonString(jsonString);
-  final userFromMap = UserJsonFactory.fromMap(userMap);
+  // 类型安全的 HTTP 请求
+  final response = await api.get<List<User>>('/users');
+  final users = response.data; // 已经解析为 List<User>！
   
-  api.close();
+  // 创建新用户
+  final newUser = User(id: '1', name: 'John', email: 'john@example.com');
+  await api.post<User>('/users', data: newUser); // 自动序列化！
 }
 ```
 
-## 🔧 高级功能
+## 🎯 完整 CRUD 示例
 
-### 拦截器
+这是一个使用 MockAPI 的真实示例：
 
 ```dart
-final api = Axios.create(AxiosConfig(
-  baseURL: 'https://api.example.com',
-));
+import 'dart:async';
+import 'package:flutter/material.dart';
+import 'package:flutter_axios/flutter_axios.dart';
 
-// 请求拦截器
-api.interceptors.request.use(
-  onRequest: (config) async {
-    config.headers['Authorization'] = 'Bearer $token';
-    print('→ ${config.method.toUpperCase()} ${config.url}');
-    return config;
-  },
-  onError: (error) async {
-    print('请求错误: ${error.message}');
-    return error;
-  },
-);
+// 导入模型和生成的代码
+import 'models/user.dart';
+import 'models/user.flutter_axios.g.dart';
 
-// 响应拦截器  
-api.interceptors.response.use(
-  onResponse: (response) async {
-    print('← ${response.statusCode} ${response.config.url}');
-    return response;
-  },
-  onError: (error) async {
-    if (error.response?.statusCode == 401) {
-      // 处理未授权
-      await refreshToken();
+void main() {
+  initializeJsonMapper();
+  initializeUserJsonMappers();
+  runApp(MyApp());
+}
+
+class UserService {
+  late final AxiosInstance _api;
+  
+  UserService() {
+    _api = Axios.create(AxiosOptions(
+      baseURL: 'https://your-api.mockapi.io',
+      timeout: Duration(seconds: 10),
+    ));
+  }
+  
+  // GET - 读取用户
+  Future<List<User>> getUsers() async {
+    final response = await _api.get('/user');
+    if (response.data is List) {
+      final rawList = response.data as List;
+      return rawList.map((item) => 
+        UserJsonFactory.fromMap(item as Map<String, dynamic>)
+      ).whereType<User>().toList();
     }
-    return error;
-  },
-);
-```
-
-### 错误处理
-
-```dart
-try {
-  final response = await api.get<User>('/users/123');
-  print('用户: ${response.data.name}');
-} catch (e) {
-  if (e is AxiosError) {
-    switch (e.type) {
-      case AxiosErrorType.connectionTimeout:
-        print('连接超时');
-        break;
-      case AxiosErrorType.receiveTimeout:
-        print('接收超时');
-        break;
-      case AxiosErrorType.badResponse:
-        print('响应错误: ${e.response?.statusCode}');
-        break;
-      case AxiosErrorType.connectionError:
-        print('连接错误: ${e.message}');
-        break;
-      case AxiosErrorType.unknown:
-        print('未知错误: ${e.message}');
-        break;
+    return [];
+  }
+  
+  // POST - 创建用户
+  Future<User?> createUser(User user) async {
+    final response = await _api.post<User>('/user', data: user);
+    return response.data;
+  }
+  
+  // PUT - 更新用户
+  Future<User?> updateUser(String id, User user) async {
+    final response = await _api.put<User>('/user/$id', data: user);
+    return response.data;
+  }
+  
+  // DELETE - 删除用户
+  Future<bool> deleteUser(String id) async {
+    try {
+      await _api.delete<void>('/user/$id');
+      return true;
+    } catch (e) {
+      return false;
     }
   }
 }
-```
 
-### 请求取消
-
-```dart
-final cancelToken = CancelToken();
-
-// 开始请求
-final future = api.get('/slow-endpoint', cancelToken: cancelToken);
-
-// 5秒后取消
-Timer(Duration(seconds: 5), () {
-  cancelToken.cancel('请求超时');
-});
-
-try {
-  final response = await future;
-  print(response.data);
-} catch (e) {
-  if (e is AxiosError && e.type == AxiosErrorType.cancelled) {
-    print('请求已取消');
-  }
-}
-```
-
-### 文件上传
-
-```dart
-import 'dart:io';
-
-final file = File('path/to/image.jpg');
-final formData = FormData();
-formData.files.add(MapEntry(
-  'file',
-  await MultipartFile.fromFile(file.path, filename: 'image.jpg'),
-));
-formData.fields.add(MapEntry('description', '头像照片'));
-
-final response = await api.post('/upload', data: formData);
-print('上传完成: ${response.data}');
-```
-
-## 🏗️ JSON 映射器功能
-
-### 支持的类型
-
-build_runner 自动处理：
-
-**基础类型：**
-- `String`、`int`、`double`、`bool`
-- `DateTime`（ISO 8601 转换）
-- 可选变体（`String?`、`int?` 等）
-
-**集合类型：**
-- `List<String>`、`List<int>`、`List<T>`
-- `Map<String, dynamic>`
-- 嵌套对象和列表
-
-**智能转换：**
-- `camelCase` ↔ `snake_case` 字段映射
-- `userName` ↔ `user_name`
-- `isActive` ↔ `is_active`
-- `createdAt` ↔ `created_at`
-
-### 复杂嵌套对象
-
-```dart
-@JsonSerializable()
-class Address {
-  final String street;
-  final String city;
-  final String zipCode;
-  final String country;
-
-  const Address({
-    required this.street,
-    required this.city,
-    required this.zipCode,
-    required this.country,
-  });
-}
-
-@JsonSerializable()
-class Company {
-  final String name;
-  final Address address;
-  final List<String> departments;
-
-  const Company({
-    required this.name,
-    required this.address,
-    required this.departments,
-  });
-}
-
-@JsonSerializable()
-class Employee {
+// 模型定义 (在 models/user.dart 中)
+@AxiosJson()
+class User {
   final String id;
   final String name;
-  final Company company;
-  final List<Address> previousAddresses;
-  final Map<String, dynamic> skills;
+  final String avatar;
+  final String city;
 
-  const Employee({
+  const User({
     required this.id,
     required this.name,
-    required this.company,
-    required this.previousAddresses,
-    required this.skills,
+    required this.avatar,
+    required this.city,
+  });
+
+  User copyWith({String? id, String? name, String? avatar, String? city}) {
+    return User(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      avatar: avatar ?? this.avatar,
+      city: city ?? this.city,
+    );
+  }
+}
+```
+
+## 🔧 高级特性
+
+### 1. 复杂嵌套对象
+
+```dart
+@AxiosJson()
+class Order {
+  final String id;
+  final User customer;           // 嵌套对象
+  final List<Product> items;     // 对象列表
+  final Address? shipping;       // 可空对象
+  final DateTime createdAt;      // 自动 ISO8601 转换
+  final Map<String, dynamic> metadata; // 动态数据
+  
+  const Order({
+    required this.id,
+    required this.customer,
+    required this.items,
+    this.shipping,
+    required this.createdAt,
+    this.metadata = const {},
   });
 }
 
-// 使用
-void main() async {
-  initializeJsonMapper();
-  initializeAddressJsonMappers();
-  initializeCompanyJsonMappers();  
-  initializeEmployeeJsonMappers();
-
-  final api = Axios.create(AxiosConfig(baseURL: 'https://api.company.com'));
-
-  // 复杂嵌套对象 - 自动处理！
-  final employee = await api.get<Employee>('/employees/123');
-  print('员工: ${employee.data.name}');
-  print('公司: ${employee.data.company.name}');
-  print('城市: ${employee.data.company.address.city}');
+@AxiosJson()
+class Product {
+  final String id;
+  final String name;
+  final double price;
+  final List<String> tags;
+  
+  const Product({required this.id, required this.name, required this.price, required this.tags});
 }
 ```
 
-### 生成的扩展方法
+### 2. 生成的辅助方法
 
-每个模型都会获得有用的扩展方法：
+运行 `build_runner` 后，你会得到强大的辅助方法：
 
 ```dart
-final user = User(/* ... */);
+// 序列化
+final jsonString = user.toJsonString();
+final map = user.toMap();
 
-// 序列化扩展
-final jsonString = user.toJsonString();     // 转换为 JSON 字符串
-final userMap = user.toMap();               // 转换为 Map
+// 反序列化
+final user = UserJsonFactory.fromJsonString('{"id":"1","name":"John"}');
+final users = UserJsonFactory.listFromJsonString('[{"id":"1"},{"id":"2"}]');
 
-// 工厂方法  
-final newUser = UserJsonFactory.fromJsonString(jsonString);
-final userFromMap = UserJsonFactory.fromMap(userMap);
-final userList = UserJsonFactory.listFromJsonString(jsonArrayString);
+// 从 Map
+final user = UserJsonFactory.fromMap({'id': '1', 'name': 'John'});
+final users = UserJsonFactory.listFromMaps([{'id': '1'}, {'id': '2'}]);
 ```
 
-## 📊 性能对比
+### 3. 自动 JSON 处理的拦截器
 
-| 特性 | 手写 JSON | json_serializable | flutter_axios |
-|------|-----------|------------------|---------------|
-| **开发时间** | 20-30分钟/模型 | 10-15分钟/模型 | **2-3分钟/模型** |
-| **代码行数** | 80-120行 | 40-60行 | **0行用户代码** |
-| **维护成本** | 高 | 中等 | **最低** |
-| **类型安全** | 手动保证 | 完整 | **完整** |
-| **运行性能** | 快 | 快 | **快** |
-| **编译时间** | 快 | 中等 | **快** |
-| **学习曲线** | 高 | 中等 | **低** |
-| **热重载** | 手动 | 需要重建 | **监听模式** |
+```dart
+class LoggingInterceptor extends Interceptor {
+  @override
+  Future<AxiosRequest> onRequest(AxiosRequest request) async {
+    print('🚀 ${request.method} ${request.url}');
+    if (request.data != null) {
+      // 数据自动序列化
+      print('📤 ${request.data}');
+    }
+    return request;
+  }
 
-## 🔄 迁移指南
+  @override
+  Future<AxiosResponse> onResponse(AxiosResponse response) async {
+    print('✅ ${response.status} ${response.request.url}');
+    // 响应数据自动解析
+    print('📥 ${response.data}');
+    return response;
+  }
+}
 
-### 从手写 JSON 处理迁移
+final api = Axios.create(AxiosOptions(baseURL: 'https://api.example.com'));
+api.interceptors.add(LoggingInterceptor());
+```
 
-1. **添加注解：**
-   ```dart
-   @JsonSerializable()
-   class User {
-     // 现有字段...
-   }
-   ```
+### 4. 错误处理
 
-2. **移除手动代码：**
-   ```dart
-   // 移除这些方法：
-   // factory User.fromJson(Map<String, dynamic> json) { ... }
-   // Map<String, dynamic> toJson() { ... }
-   ```
+```dart
+try {
+  final user = await api.get<User>('/users/123');
+  print('用户: ${user.data?.name}');
+} on AxiosError catch (e) {
+  if (e.type == AxiosErrorType.timeout) {
+    print('请求超时');
+  } else if (e.response?.status == 404) {
+    print('用户未找到');
+  } else {
+    print('错误: ${e.message}');
+  }
+}
+```
 
-3. **生成和注册：**
-   ```bash
-   dart run build_runner build
-   ```
-   ```dart
-   initializeJsonMapper();
-   initializeUserJsonMappers();
-   ```
-
-### 从 json_annotation 迁移
-
-1. **更新依赖：**
-   ```yaml
-   dependencies:
-     flutter_axios: ^1.1.0  # 替换 json_annotation
-   
-   dev_dependencies:
-     build_runner: ^2.7.1   # 保留 build_runner
-   ```
-
-2. **更新导入：**
-   ```dart
-   import 'package:flutter_axios/flutter_axios.dart';  // 替换 json_annotation
-   ```
-
-3. **重新生成代码：**
-   ```bash
-   dart run build_runner clean
-   dart run build_runner build
-   ```
-
-## 🛠️ 开发工作流
+## 🔄 开发工作流
 
 ### 监听模式（推荐）
 
 ```bash
-# 启动监听模式 - 文件变更时自动重新生成
 dart run build_runner watch --delete-conflicting-outputs
 ```
 
-### 生产构建
+这会监听变化并在你修改模型时自动重新生成代码。
+
+### 单次构建
 
 ```bash
-# 生产环境一次性生成
 dart run build_runner build --delete-conflicting-outputs
 ```
 
-### 清理生成文件
+### 清理生成的文件
 
 ```bash
-# 清理所有生成的文件
 dart run build_runner clean
+```
+
+## 📊 性能对比
+
+| 功能 | 手动 JSON | json_serializable | flutter_axios |
+|------|----------|------------------|---------------|
+| 开发时间 | 20-30 分钟/模型 | 10-15 分钟/模型 | **2-3 分钟/模型** |
+| 代码行数 | 80-120 行 | 40-60 行 | **0 用户代码行** |
+| 类型安全 | 手动 | 完整 | **完整** |
+| 热重载 | 手动 | 需要重建 | **监听模式** |
+| 框架冲突 | 无 | 可能 | **无** |
+| 学习曲线 | 高 | 中等 | **低** |
+
+## 🏗️ 项目结构
+
+```
+your_project/
+├── lib/
+│   ├── models/
+│   │   ├── user.dart                      # 你的模型
+│   │   └── user.flutter_axios.g.dart      # 生成的代码
+│   └── main.dart
+├── pubspec.yaml
+└── build.yaml                             # build_runner 配置
 ```
 
 ## 🔧 配置
 
-### 自定义构建配置
-
-在项目根目录创建 `build.yaml`：
+### build.yaml
 
 ```yaml
 targets:
   $default:
     builders:
-      flutter_axios|simple_json:
+      flutter_axios:json_serializable:
         enabled: true
         generate_for:
           - lib/**
-          - test/**
-        options:
-          generate_extensions: true
-          generate_factories: true
+          - example/lib/**
 ```
 
-### 排除文件
+### 支持的类型
 
-```yaml
-targets:
-  $default:
-    builders:
-      flutter_axios|simple_json:
-        generate_for:
-          - lib/**
-          - "!lib/legacy/**"  # 排除遗留代码
+- **基础类型**: `String`, `int`, `double`, `bool`, `DateTime`
+- **集合**: `List<T>`, `Map<String, dynamic>`
+- **可空类型**: `String?`, `DateTime?` 等
+- **自定义对象**: 任何带有 `@AxiosJson()` 的类
+- **嵌套**: 复杂对象层次结构
+
+## 🚀 迁移指南
+
+### 从 json_annotation 迁移
+
+将 `@JsonSerializable()` 替换为 `@AxiosJson()`：
+
+```dart
+// 之前
+@JsonSerializable()
+class User {
+  // ... 字段
+  
+  factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
+  Map<String, dynamic> toJson() => _$UserToJson(this);
+}
+
+// 之后
+@AxiosJson()
+class User {
+  // ... 只需要字段，不需要手动方法！
+}
 ```
 
-## 🐛 故障排除
+### 从手动 JSON 迁移
+
+将所有手动 `fromJson`/`toJson` 替换为 `@AxiosJson()`：
+
+```dart
+// 之前: 50+ 行手动 JSON 代码
+class User {
+  final String id;
+  final String name;
+  
+  User({required this.id, required this.name});
+  
+  factory User.fromJson(Map<String, dynamic> json) {
+    return User(
+      id: json['id'] ?? '',
+      name: json['name'] ?? '',
+    );
+  }
+  
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+    };
+  }
+}
+
+// 之后: 只需要注解！
+@AxiosJson()
+class User {
+  final String id;
+  final String name;
+  
+  const User({required this.id, required this.name});
+}
+```
+
+## 🆕 v1.1.1 新特性
+
+### 变更
+- **注解重命名**: `@JsonSerializable()` → `@AxiosJson()`
+  - 避免与 `json_annotation` 包冲突
+  - 更简洁的 10 字符注解
+  - 明确表示这是 Flutter Axios 专用
+  - 保持所有现有功能
+
+## 🛠️ 故障排除
 
 ### 常见问题
 
-**问：找不到生成的文件？**
-```bash
-# 确保运行了代码生成
-dart run build_runner build
-```
+1. **找不到生成的文件**
+   ```bash
+   dart run build_runner build --delete-conflicting-outputs
+   ```
 
-**问：生成函数的导入错误？**
-```dart
-// 确保导入了生成的文件
-import 'user.flutter_axios.g.dart';
-```
+2. **类型 'dynamic' 不是子类型**
+   - 确保初始化 JSON 映射器：`initializeUserJsonMappers()`
+   - 检查你的模型是否有 `@AxiosJson()` 注解
 
-**问：不支持的类型？**
-- 检查字段类型是否在支持类型列表中
-- 复杂自定义类型可能需要自己的 `@JsonSerializable()` 注解
+3. **build runner 冲突**
+   ```bash
+   dart run build_runner clean
+   dart run build_runner build --delete-conflicting-outputs
+   ```
 
-**问：监听模式不工作？**
-```bash
-# 重启监听模式
-dart run build_runner clean
-dart run build_runner watch --delete-conflicting-outputs
-```
+### 最佳实践
 
-**问：更新后构建错误？**
-```bash
-# 清理并重新构建
-dart run build_runner clean
-dart pub get
-dart run build_runner build --delete-conflicting-outputs
-```
+- 尽可能使用 `const` 构造函数
+- 在 `main()` 中早期初始化 JSON 映射器
+- 开发期间使用监听模式
+- 适当处理可空字段
+- 使用描述性字段名
+
+## 📚 示例
+
+查看 `/example` 目录了解：
+- 完整 CRUD 应用程序
+- 复杂嵌套对象
+- 错误处理模式
+- 拦截器使用
+- 真实 API 集成
 
 ## 🤝 贡献
 
-欢迎贡献！请随时提交 Pull Request。
-
-### 开发设置
-
-```bash
-git clone https://github.com/Not996NotOT/flutter_axios.git
-cd flutter_axios
-dart pub get
-dart test
-```
-
-### 运行示例
-
-```bash
-cd example
-dart pub get
-dart run build_runner build
-dart main.dart
-```
+我们欢迎贡献！请查看我们的[贡献指南](CONTRIBUTING.md)了解详情。
 
 ## 📄 许可证
 
 本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情。
 
-## 🙏 致谢
+## ⭐ 支持我们
 
-- 受 [Axios](https://axios-http.com/) 启发 - JavaScript 的优秀 HTTP 客户端
-- 使用 [build_runner](https://pub.dev/packages/build_runner) 构建 - Dart 的代码生成工具
-- 感谢 Flutter 和 Dart 团队提供的出色框架
-
-## 📈 路线图
-
-- [ ] GraphQL 支持
-- [ ] WebSocket 集成  
-- [ ] 缓存机制
-- [ ] 重试机制
-- [ ] 上传进度跟踪
-- [ ] 更多序列化选项
-
----
-
-<div align="center">
-
-**[⭐ 为这个仓库点星](https://github.com/Not996NotOT/flutter_axios) 如果它对你有帮助！**
-
-用 ❤️ 为 Flutter 社区制作
-
-</div>
+如果这个包对你有帮助，请在 [GitHub](https://github.com/Not996NotOT/flutter_axios) 上给个 ⭐ 并在 [pub.dev](https://pub.dev/packages/flutter_axios) 上点个 👍！
