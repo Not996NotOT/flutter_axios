@@ -11,4 +11,9 @@ export 'src/interceptors/request_interceptor.dart';
 export 'src/interceptors/response_interceptor.dart';
 export 'src/json_mapper/json_mapper.dart';
 export 'src/models/request_options.dart';
+export 'src/streaming/axios_streaming_extension.dart';
+export 'src/streaming/sse_client.dart';
+// 流式功能扩展
+export 'src/streaming/stream_types.dart';
+export 'src/streaming/websocket_client.dart';
 export 'src/types/types.dart';

@@ -5,6 +5,44 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2025-09-25
+
+### Added
+- **🌊 流式功能支持** - 全新的流式 HTTP 处理能力
+  - `getStream()` - 流式响应，逐行处理大数据
+  - `postStream()` - 流式 POST 请求
+  - `downloadStream()` - 带进度跟踪的流式下载
+  - `connectSSE()` - Server-Sent Events 实时事件流
+  - `connectWebSocket()` - WebSocket 双向实时通信
+
+### Enhanced
+- **📥 渐进式下载** - 大文件下载进度跟踪
+  - 实时下载速度计算
+  - 剩余时间估算
+  - 可配置的缓冲区大小
+  - 自动重连机制
+
+### New Types
+- **流式响应类型**
+  - `StreamedAxiosResponse<T>` - 流式响应包装器
+  - `SSEEvent` - Server-Sent Events 事件
+  - `WebSocketMessage` - WebSocket 消息
+  - `DownloadProgress` - 下载进度信息
+
+### Configuration Options
+- **流式选项配置**
+  - `SSEOptions` - SSE 连接配置（重连、超时等）
+  - `WebSocketOptions` - WebSocket 连接配置
+  - `StreamDownloadOptions` - 下载流配置
+
+### Dependencies
+- **新增依赖** - `web_socket_channel: ^2.4.0` 用于 WebSocket 支持
+
+### Backward Compatibility
+- ✅ **完全向后兼容** - 所有现有 API 保持不变
+- ✅ **扩展方式添加** - 流功能作为 AxiosInstance 扩展方法
+- ✅ **可选使用** - 不影响现有代码，按需使用新功能
+
 ## [1.1.4] - 2025-09-25
 
 ### Added

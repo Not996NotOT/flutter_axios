@@ -23,6 +23,8 @@ A powerful HTTP client for Flutter inspired by Axios.js, featuring revolutionary
 - **🔥 Hot Reload Support** - Watch mode with build_runner
 - **📚 Comprehensive Documentation** - Examples and guides
 - **✅ Unit Tested** - Reliable and production-ready
+- **🌊 Streaming Support** - Stream responses, SSE, and WebSocket connections
+- **📥 Progressive Downloads** - Stream large files with progress tracking
 
 ## 🚀 Quick Start
 
@@ -34,7 +36,8 @@ Add to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  flutter_axios: ^1.1.4
+  flutter_axios: ^1.2.0
+  # WebSocket support is included automatically
 
 dev_dependencies:
   build_runner: ^2.4.12
@@ -313,6 +316,47 @@ try {
 }
 ```
 
+### 5. Streaming Features 🌊
+
+#### Stream Responses
+```dart
+// Stream large responses line by line
+final response = await api.getStream('/large-data');
+await for (final line in response.dataStream) {
+  print('Received: $line');
+}
+```
+
+#### Progressive Downloads
+```dart
+// Download with progress tracking
+final downloadStream = api.downloadStream('/large-file.zip');
+await for (final progress in downloadStream) {
+  print('Downloaded: ${progress.progressPercent?.toStringAsFixed(1)}%');
+  print('Speed: ${progress.speed != null ? (progress.speed! / 1024).toStringAsFixed(1) : "?"} KB/s');
+}
+```
+
+#### Server-Sent Events (SSE)
+```dart
+// Real-time server events
+final sseStream = api.connectSSE('/events');
+await for (final event in sseStream) {
+  print('Event: ${event.event} - Data: ${event.data}');
+}
+```
+
+#### WebSocket Connections
+```dart
+// Bidirectional real-time communication
+final wsStream = api.connectWebSocket('/ws');
+await for (final message in wsStream) {
+  if (message.type == WebSocketMessageType.text) {
+    print('Received: ${message.data}');
+  }
+}
+```
+
 ## 🔄 Development Workflow
 
 ### Watch Mode (Recommended)
@@ -345,6 +389,8 @@ dart run build_runner clean
 | Hot Reload | Manual | Rebuild needed | **Watch mode** |
 | Framework Conflicts | None | Possible | **None** |
 | Learning Curve | High | Medium | **Low** |
+| Streaming Support | Manual | None | **Built-in** |
+| Real-time Features | Manual | None | **SSE + WebSocket** |
 
 ## 🏗️ Project Structure
 
@@ -381,6 +427,8 @@ targets:
 - **Nullable**: `String?`, `DateTime?`, etc.
 - **Custom Objects**: Any class with `@AxiosJson()`
 - **Nested**: Complex object hierarchies
+- **Streaming**: `Stream<String>`, `Stream<DownloadProgress>`
+- **Real-time**: `Stream<SSEEvent>`, `Stream<WebSocketMessage>`
 
 ## 🚀 Migration Guide
 

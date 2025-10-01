@@ -85,8 +85,9 @@ void main() {
       test('should make successful POST request with JSON data', () async {
         // Arrange
         final requestData = {'name': 'John', 'email': 'john@example.com'};
-        final responseBody = '{"id": 1, "name": "John", "email": "john@example.com"}';
-        
+        final responseBody =
+            '{"id": 1, "name": "John", "email": "john@example.com"}';
+
         when(mockClient.post(
           Uri.parse('https://api.example.com/users'),
           headers: anyNamed('headers'),
@@ -99,7 +100,7 @@ void main() {
         // Assert
         expect(response.status, 201);
         expect(response.data, contains('John'));
-        
+
         // Verify the request was made with correct JSON body
         verify(mockClient.post(
           Uri.parse('https://api.example.com/users'),
@@ -117,7 +118,7 @@ void main() {
         // Arrange
         final requestData = {'name': 'John Updated'};
         final responseBody = '{"id": 1, "name": "John Updated"}';
-        
+
         when(mockClient.put(
           Uri.parse('https://api.example.com/users/1'),
           headers: anyNamed('headers'),
@@ -222,7 +223,7 @@ void main() {
         timeout: Duration(seconds: 10),
         headers: {'Content-Type': 'application/json'},
       );
-      
+
       expect(config.baseURL, 'https://api.example.com');
       expect(config.timeout, const Duration(seconds: 10));
       expect(config.headers, {'Content-Type': 'application/json'});
@@ -233,14 +234,14 @@ void main() {
         baseURL: 'https://api.example.com',
         headers: {'Authorization': 'Bearer token'},
       );
-      
+
       const config2 = AxiosConfig(
         timeout: Duration(seconds: 5),
         headers: {'Content-Type': 'application/json'},
       );
-      
+
       final merged = config1.merge(config2);
-      
+
       expect(merged.baseURL, 'https://api.example.com');
       expect(merged.timeout, const Duration(seconds: 5));
       expect(merged.headers, {
@@ -256,12 +257,12 @@ void main() {
         method: HttpMethod.get,
         url: 'https://api.example.com/users',
       );
-      
+
       final error = AxiosError.timeout(
         message: 'Request timeout',
         request: request,
       );
-      
+
       expect(error.type, AxiosErrorType.timeout);
       expect(error.message, 'Request timeout');
       expect(error.request, request);
@@ -272,12 +273,12 @@ void main() {
         method: HttpMethod.get,
         url: 'https://api.example.com/users',
       );
-      
+
       final error = AxiosError.network(
         message: 'Network error',
         request: request,
       );
-      
+
       expect(error.type, AxiosErrorType.network);
       expect(error.message, 'Network error');
       expect(error.request, request);
@@ -288,7 +289,7 @@ void main() {
         method: HttpMethod.get,
         url: 'https://api.example.com/users',
       );
-      
+
       final response = AxiosResponse<dynamic>(
         data: 'Not Found',
         status: 404,
@@ -297,13 +298,13 @@ void main() {
         request: request,
         rawData: 'Not Found',
       );
-      
+
       final error = AxiosError.response(
         message: 'Request failed',
         response: response,
         request: request,
       );
-      
+
       expect(error.type, AxiosErrorType.response);
       expect(error.message, 'Request failed');
       expect(error.response, response);

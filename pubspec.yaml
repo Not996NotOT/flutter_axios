@@ -1,6 +1,6 @@
 name: flutter_axios
 description: A promise-based HTTP client for Flutter inspired by Axios. Provides interceptors, request/response transformation, error handling, and automatic JSON conversion.
-version: 1.1.4
+version: 1.2.0
 homepage: https://github.com/Not996NotOT/flutter_axios
 
 environment:
@@ -15,6 +15,7 @@ dependencies:
   meta: ^1.16.0
   build: ^3.1.0
   glob: ^2.1.3
+  web_socket_channel: ^2.4.0
 
 dev_dependencies:
   flutter_test:

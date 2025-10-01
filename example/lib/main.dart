@@ -139,7 +139,7 @@ class _UserManagementPageState extends State<UserManagementPage> {
       final response = await _axios.post<User>('/user', data: newUser);
 
       final createdUser = response.data;
-      if (createdUser != null) {
+      if (createdUser is User) {
         setState(() {
           _users.add(createdUser);
         });
@@ -170,7 +170,7 @@ class _UserManagementPageState extends State<UserManagementPage> {
           await _axios.put<User>('/user/${user.id}', data: updatedUser);
 
       final updatedUserData = response.data;
-      if (updatedUserData != null) {
+      if (updatedUserData is User) {
         final index = _users.indexWhere((u) => u.id == user.id);
         if (index != -1) {
           setState(() {

@@ -34,7 +34,7 @@ Axios.js からインスピレーションを受けた強力な Flutter HTTP ク
 
 ```yaml
 dependencies:
-  flutter_axios: ^1.1.4
+  flutter_axios: ^1.2.0
 
 dev_dependencies:
   build_runner: ^2.4.12

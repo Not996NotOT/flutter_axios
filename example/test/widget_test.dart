@@ -25,8 +25,10 @@ void main() {
     expect(find.byIcon(Icons.refresh), findsOneWidget);
 
     // Verify that the main content area is displayed (either loading, empty, or data)
-    final hasRefreshIndicator = find.byType(RefreshIndicator).evaluate().isNotEmpty;
-    final hasLoadingIndicator = find.byType(CircularProgressIndicator).evaluate().isNotEmpty;
+    final hasRefreshIndicator =
+        find.byType(RefreshIndicator).evaluate().isNotEmpty;
+    final hasLoadingIndicator =
+        find.byType(CircularProgressIndicator).evaluate().isNotEmpty;
     final hasNoDataText = find.text('No user data').evaluate().isNotEmpty;
     expect(hasRefreshIndicator || hasLoadingIndicator || hasNoDataText, isTrue);
   });
