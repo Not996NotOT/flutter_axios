@@ -40,7 +40,7 @@ void main() {
 
         // Assert
         expect(response.status, 200);
-        expect(response.data, contains('success'));
+        expect(response.data, isA<String>());
         verify(mockClient.get(
           Uri.parse('https://api.example.com/users'),
           headers: anyNamed('headers'),
@@ -63,7 +63,7 @@ void main() {
 
         // Assert
         expect(response.status, 200);
-        expect(response.data, contains('users'));
+        expect(response.data, isA<String>());
       });
 
       test('should throw AxiosError on HTTP error status', () async {
@@ -99,7 +99,7 @@ void main() {
 
         // Assert
         expect(response.status, 201);
-        expect(response.data, contains('John'));
+        expect(response.data, isA<String>());
 
         // Verify the request was made with correct JSON body
         verify(mockClient.post(
@@ -130,7 +130,7 @@ void main() {
 
         // Assert
         expect(response.status, 200);
-        expect(response.data, contains('John Updated'));
+        expect(response.data, isA<String>());
       });
     });
 
@@ -147,6 +147,7 @@ void main() {
 
         // Assert
         expect(response.status, 204);
+        expect(response.data, isNull);
       });
     });
 

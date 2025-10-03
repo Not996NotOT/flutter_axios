@@ -58,8 +58,8 @@ class GlobalInitializerBuilder implements Builder {
     // 导入所有模型类和生成的文件
     for (final className in classNames) {
       final snakeCase = _camelToSnake(className);
-      buffer.writeln('import \'models/${snakeCase}.dart\';');
-      buffer.writeln('import \'models/${snakeCase}.flutter_axios.g.dart\';');
+      buffer.writeln('import \'models/$snakeCase.dart\';');
+      buffer.writeln('import \'models/$snakeCase.flutter_axios.g.dart\';');
     }
     buffer.writeln();
 
@@ -85,7 +85,7 @@ class GlobalInitializerBuilder implements Builder {
       buffer.writeln('        break;');
     }
     buffer.writeln('      default:');
-    buffer.writeln('        print(\'警告: 未找到类型 \${type} 的 JSON 映射器\');');
+    buffer.writeln('        print(\'警告: 未找到类型 \$type 的 JSON 映射器\');');
     buffer.writeln('    }');
     buffer.writeln('  }');
     buffer.writeln('}');
@@ -376,7 +376,7 @@ class _ClassInfo {
   final String className;
   final List<_FieldInfo> fields;
 
-  _ClassInfo({required this.className, required this.fields});
+  const _ClassInfo({required this.className, required this.fields});
 }
 
 /// 字段信息.
@@ -385,7 +385,7 @@ class _FieldInfo {
   final String type;
   final bool isOptional;
 
-  _FieldInfo(
+  const _FieldInfo(
       {required this.name, required this.type, required this.isOptional});
 }
 

@@ -12,7 +12,7 @@ class WebSocketClient {
   final AxiosConfig? _config;
   WebSocketChannel? _channel;
   StreamController<WebSocketMessage>? _controller;
-  StreamSubscription? _subscription;
+  StreamSubscription<dynamic>? _subscription;
   Timer? _pingTimer;
   bool _isConnected = false;
   int _reconnectAttempts = 0;
@@ -70,7 +70,7 @@ class WebSocketClient {
       // 监听消息
       _subscription = _channel!.stream.listen(
         (data) => _handleMessage(data),
-        onError: (error) => _handleError(error, options),
+        onError: (dynamic error) => _handleError(error, options),
         onDone: () => _handleDisconnection(options),
       );
 
@@ -78,7 +78,7 @@ class WebSocketClient {
       if (options.pingInterval != null) {
         _setupPingTimer(options.pingInterval!);
       }
-    } catch (error) {
+    } on Exception catch (error) {
       _handleError(error, options);
     }
   }
@@ -147,7 +147,7 @@ class WebSocketClient {
             type: WebSocketMessageType.ping,
             data: 'ping',
           ));
-        } catch (e) {
+        } on Exception catch (e) {
           // Ping 失败，可能连接已断开
           _handleError(e, _lastOptions ?? const WebSocketOptions());
         }

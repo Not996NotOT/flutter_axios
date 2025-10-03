@@ -1,0 +1,46 @@
+# Pub Publish Ignore Configuration
+# Files and directories to exclude from the published package
+
+# Example directory (exclude everything except what we want)
+example/
+!example/README.md
+!example/pubspec.yaml
+!example/analysis_options.yaml
+!example/lib/
+!example/lib/**/*.dart
+
+# Test files
+test/
+!test/flutter_axios_test.dart
+
+# Development and testing files
+TESTING_REPORT.md
+
+# IDE and OS files (already in .gitignore, but repeated for clarity)
+.vscode/
+.idea/
+*.iml
+.DS_Store
+
+# Build artifacts
+.dart_tool/
+.packages
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+coverage/
+
+# Temporary and local development files
+*.tmp
+*.temp
+test_crud.dart
+
+# Web files
+web/
+
+# Generated mock files (keep only in test directory for development)
+**/*.mocks.dart
+!test/*.mocks.dart
+

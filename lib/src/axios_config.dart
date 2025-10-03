@@ -81,7 +81,9 @@ class AxiosConfig {
 
   /// Merge this config with another config
   AxiosConfig merge(AxiosConfig? other) {
-    if (other == null) return this;
+    if (other == null) {
+      return this;
+    }
 
     return AxiosConfig(
       baseURL: other.baseURL ?? baseURL,
@@ -99,9 +101,15 @@ class AxiosConfig {
   }
 
   static Headers? _mergeHeaders(Headers? base, Headers? override) {
-    if (base == null && override == null) return null;
-    if (base == null) return Map.from(override!);
-    if (override == null) return Map.from(base);
+    if (base == null && override == null) {
+      return null;
+    }
+    if (base == null) {
+      return Map.from(override!);
+    }
+    if (override == null) {
+      return Map.from(base);
+    }
 
     final merged = Map<String, String>.from(base);
     merged.addAll(override);
@@ -110,9 +118,15 @@ class AxiosConfig {
 
   static QueryParameters? _mergeParams(
       QueryParameters? base, QueryParameters? override) {
-    if (base == null && override == null) return null;
-    if (base == null) return Map.from(override!);
-    if (override == null) return Map.from(base);
+    if (base == null && override == null) {
+      return null;
+    }
+    if (base == null) {
+      return Map.from(override!);
+    }
+    if (override == null) {
+      return Map.from(base);
+    }
 
     final merged = Map<String, dynamic>.from(base);
     merged.addAll(override);

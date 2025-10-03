@@ -14,7 +14,7 @@ class SSEClient {
   final http.Client _client;
   final AxiosConfig? _config;
   StreamController<SSEEvent>? _controller;
-  StreamSubscription? _subscription;
+  StreamSubscription<dynamic>? _subscription;
   bool _isConnected = false;
   int _reconnectAttempts = 0;
 
@@ -94,16 +94,15 @@ class SSEClient {
           .transform(const LineSplitter())
           .listen(
             (line) => _processSSELine(line),
-            onError: (error) =>
+            onError: (dynamic error) =>
                 _handleError(error, url, options, customHeaders),
             onDone: () => _handleDisconnection(url, options, customHeaders),
           );
-    } catch (error) {
+    } on Exception catch (error) {
       _handleError(error, url, options, customHeaders);
     }
   }
 
-  String _buffer = '';
   String? _currentId;
   String? _currentEvent;
   String _currentData = '';
